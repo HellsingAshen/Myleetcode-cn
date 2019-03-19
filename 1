@@ -1,0 +1,322 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <sys/types.h>
+#include <regex.h>
+#include <sys/socket.h>
+#include "leetcode.h"
+
+struct ListNode*  consList(int* pi, int iCount);
+struct ListNode* addTwoNumbers(struct ListNode* l1, struct ListNode* l2) ;
+
+
+void main()
+{
+
+    int    aiArr1[3] = {2, 4, 3};
+    int    aiArr2[3] = {5, 6, 4};
+    struct ListNode* pstL1 = NULL;
+    struct ListNode* pstL2 = NULL;
+    struct ListNode* pstRet = NULL;
+    
+    pstL1 = consList(aiArr1, 3);
+    pstL2 = consList(aiArr2, 3);
+    
+
+    pstRet = addTwoNumbers(pstL2, pstL1);
+    
+    while (pstRet)
+    {
+        printf("%d-> ", pstRet->val);
+        pstRet = pstRet->next;
+    }
+    
+
+#if 0
+    char            *pSrc           = "([)]";
+    /*char            *pSrc           = "()";*/
+    int             iRet            = -1;
+
+    iRet = isValid(pSrc);
+    printf ("hello c. iRet = [%d]\n", iRet);
+#endif
+    return;
+}
+
+
+/*
+ * leetcode 3:
+ * You are given two non-empty linked lists representing two non-negative integers. The digits are stored in reverse order and each of their nodes contain a single digit. Add the two numbers and return it as a linked list.
+ *
+ * You may assume the two numbers do not contain any leading zero, except the number 0 itself.
+ *
+ * Example:
+ *
+ * Input: (2 -> 4 -> 3) + (5 -> 6 -> 4)
+ * Output: 7 -> 0 -> 8
+ * Explanation: 342 + 465 = 807.
+ */
+
+
+struct ListNode*  consList(int* pi, int iCount)
+{
+    struct ListNode*    pstRet          = NULL;
+    struct ListNode*    pstTmp          = NULL;
+    struct ListNode*    pstTail         = NULL;
+    int                 i               = 0;
+    while (i < iCount)
+    {
+        pstTmp = malloc (sizeof (struct ListNode)); 
+        pstTmp->val = *(pi + i);
+
+        if (!pstRet)
+        {
+            pstRet = pstTmp;
+            pstTail = pstTmp;
+        }
+        else
+        {
+            pstTail->next = pstTmp;
+            pstTail = pstTmp;
+        }
+        i++;
+    }
+
+    return pstRet;
+}
+
+/*
+struct ListNode {
+    int val;
+    struct ListNode *next;
+};
+*/
+struct ListNode* addTwoNumbers(struct ListNode* l1, struct ListNode* l2) {
+    int                 iCarry          = 0;
+    struct ListNode*    pstL1           = NULL;
+    struct ListNode*    pstL2           = NULL;
+    struct ListNode*    pstL3           = NULL;
+    struct ListNode*    pstRet          = NULL;
+    struct ListNode*    pstTmp          = NULL;
+    struct ListNode*    pstTail         = NULL;
+
+    if (!l1) 
+    {
+        return l2;
+    }
+    if (!l2)
+    {
+        return l1;
+    }
+    
+    pstL1 = l1;
+    pstL2 = l2;
+
+    while (pstL2 && pstL1)
+    {
+        pstL3 = malloc(sizeof(struct ListNode));
+        /* assert(pstL3 != NULL); */
+        
+
+        pstL3->val = (pstL1->val + pstL2->val + iCarry) % 10;
+        pstL3->next = NULL;
+
+        if (pstL2->val + pstL1->val + iCarry > 9)
+        {
+            iCarry = 1;
+        }
+        else
+        {
+            iCarry = 0;
+        }
+
+        /* add into list */
+        if (!pstRet)
+        {
+            pstRet = pstL3;
+            pstTail = pstL3;
+        }
+        else
+        {
+            pstTail->next = pstL3;
+            pstTail = pstL3;
+        }
+        pstL3 = NULL;
+
+        pstL1 = pstL1->next;
+        pstL2 = pstL2->next;
+    }
+
+    if (!pstL1)
+    {
+        pstTmp = pstL2;
+        
+    }
+    else
+    {
+        pstTmp = pstL1;
+    }
+    
+    while (pstTmp)
+    {
+        pstL3 = malloc(sizeof(struct ListNode));
+        pstL3->val = (pstTmp->val + iCarry) % 10;
+        pstL3->next = NULL;
+        if (pstTmp->val + iCarry > 9)
+        {
+            iCarry = 1;
+        }
+        else
+        {
+            iCarry = 0;
+        }
+        pstTail->next = pstL3;
+        pstTail = pstL3;
+        pstL3 = NULL;
+
+        pstTmp = pstTmp->next;
+    }
+
+    if (iCarry)
+    {
+        pstL3 = malloc(sizeof(struct ListNode));
+        pstL3->val = 1;
+        pstL3->next = NULL;
+        pstTail->next = pstL3;
+        pstTail = pstL3;
+        pstL3 = NULL;
+    }
+
+    return pstRet;
+
+}
+/* leetcode 1:
+ *  
+ *  Given an array of integers, return indices of the two numbers such that they add up to a specific target.
+ *
+ *  You may assume that each input would have exactly one solution, and you may not use the same element twice.
+ *
+ *  Example:
+ *
+ *  Given nums = [2, 7, 11, 15], target = 9,
+ *
+ *  Because nums[0] + nums[1] = 2 + 7 = 9,
+ *  return [0, 1].
+ */
+int* twoSum(int* nums, int numsSize, int target) {
+    int*            pRet            = malloc(sizeof(int) * 2);
+    int             i               = 0;
+    int             j               = 0;
+    
+    for (; i < numsSize; i++)
+    {
+        for (j = i + 1; j < numsSize; j++)
+        {
+            if (target == *(nums + i) + *(nums + j))        
+            {
+                *pRet = i;
+                *(pRet + 1) = j;
+                return pRet;
+            }
+        }
+    }
+    
+    return  NULL;
+}
+
+/* leetcode 2:
+ *  Given a string containing just the characters '(', ')', '{', '}', '[' and ']', determine if the input string is valid.
+
+    An input string is valid if:
+
+    Open brackets must be closed by the same type of brackets.
+    Open brackets must be closed in the correct order.
+    Note that an empty string is also considered valid.
+ */
+
+#define bool int
+#define false 0
+#define  true  1
+
+bool isValid(char* s) {
+    int             i = 0;
+    int             j = 0;
+    char*           pTmp            = NULL;
+    int             iRet            = true;
+
+    if (!s) return false;
+    
+    pTmp = malloc(strlen(s));
+    memset(pTmp, 0, strlen(s));
+    
+    i = 0;
+    j = 0; /* stack size */
+    while (i < strlen(s))
+    {
+        if ((*(s + i) == '(')  
+            || (*(s + i) == '[')  
+            || (*(s + i) == '{'))
+        {
+            *(pTmp + j)  = *(s + i);
+            j++;
+            i++;
+            continue;
+        }
+
+        if (!j)
+        {
+            iRet = false;
+            goto end;
+        }
+
+        if (*(s + i) == ')') 
+        {
+            if (*(pTmp + j - 1) != '(')
+            {
+                iRet = false;
+                break;
+            }
+            else
+            {
+                j--;
+                i++;
+                continue;
+            }
+        } 
+        
+        if (*(s + i) == ']') 
+        {
+            if (*(pTmp + j - 1) != '[')
+            {
+                iRet = false;
+                break;
+            }
+            else
+            {
+                j--;
+                i++;
+                continue;
+            }
+        } 
+        if (*(s + i) == '}') 
+        {
+            if (*(pTmp + j - 1) != '{')
+            {
+                iRet = false;
+                break;
+            }
+            else
+            {
+                j--;
+                i++;
+                continue;
+            }
+        } 
+    }
+            
+end:
+    free (pTmp);
+    return iRet;
+    
+}
+
