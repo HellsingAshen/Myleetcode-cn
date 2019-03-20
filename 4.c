@@ -6,6 +6,42 @@
 #include "leetcode.h"
 
 #define bool int
+/*
+ *  leetcode 9:
+ *  Level    : easy
+ *  326. Power of Three
+ *
+ * Given an integer, write a function to determine if it is a power of three.
+ *
+ * Example 1:
+ *
+ * Input: 27
+ * Output: true
+ * Example 2:
+ *
+ * Input: 0
+ * Output: false
+ */
+
+bool isPowerOfThree(int n) {
+    int             m               = 0;
+    int             l               = 0;
+    if ((n <= 0) || (n > (2 << 31) - 1)) return false;
+    if (1 == n) return true;
+
+    m = n;
+    l = n % 3;
+
+    while (!l && (m > 1))
+    {
+        l = m % 3;
+        m = m / 3;
+    }
+
+    if (l) return false;
+    
+    return true;
+}
 
 /*
  *  leetcode 8:
@@ -324,13 +360,18 @@ char* toLowerCase(char* str) {
 int main(int argc, char* argv[])
 {
 
+    int                 iRet                      = 0;
+    iRet    = isPowerOfThree(27);
+    printf("%d.\n", iRet);
+    iRet    = isPowerOfThree(25);
+    printf("%d.\n", iRet);
+#if 0
     //char* p = toHex(26);
     //char* p = toHex(-1);
     char* p = toHex(-2147483648);
 
     printf("%s.\n", p);
 
-#if 0
     printf("%d.\n", complCode(-1));
     printf("%d.\n", complCode(5));
     printf("%d.\n", complCode(-5));
