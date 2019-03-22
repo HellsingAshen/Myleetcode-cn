@@ -1,0 +1,427 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <assert.h>
+
+#include "leetcode.h"
+
+#define bool int
+struct TreeNode* preTravel(struct TreeNode* root, int iVal);
+
+/*
+ *  leetcode 13:
+ *  Level    : esay
+ *  693. Binary Number with Alternating Bits
+ *  Given a positive integer, check whether it has alternating bits: namely, if two adjacent bits will always have different values.
+ *
+ *  Example 1:
+ *  Input: 5
+ *  Output: True
+ *  Explanation:
+ *  The binary representation of 5 is: 101
+ */
+bool hasAlternatingBits(int n) {
+    int             i               = 0;
+    int             j               = 0;
+
+    i = n;
+    j = i & 0x1;
+    i = i >> 1;
+    
+    while (((i&0x01) != j) && (i > 0))
+    {
+        j = i & 0x01;
+        i = i >> 1;
+    } 
+
+    if (i > 0) return false;
+    return true;
+}
+
+/*
+ *  leetcode 13:
+ *  Level    : esay
+ *  496. Next Greater Element I
+ *  You are given two arrays (without duplicates) nums1 and nums2 where nums1¡¯s elements are subset of nums2. Find all the next greater numbers for nums1's elements in the corresponding places of nums2.
+ *
+ *  The Next Greater Number of a number x in nums1 is the first greater number to its right in nums2. If it does not exist, output -1 for this number.
+ *
+ *  Example 1:
+ *  Input: nums1 = [4,1,2], nums2 = [1,3,4,2].
+ *  Output: [-1,3,-1]
+ */
+int* nextGreaterElement(int* findNums, int findNumsSize, int* nums, int numsSize, int* returnSize) {
+    int*                piRet               = NULL;
+    int                 i                   = 0;
+    int                 j                   = 0;
+    int                 iStart              = 0;
+
+    piRet = malloc(sizeof(int) * findNumsSize);    
+    for (; i < findNumsSize; i++)
+    {
+        for (j = 0,iStart = 0; j < numsSize; j++)
+        {
+            if (findNums[i] == nums[j])
+            {
+                iStart = 1;
+            }
+            if (iStart && (findNums[i] < nums[j]))
+            {
+                break;
+            }
+        }
+        if (j != numsSize)
+        {
+            piRet[i] = nums[j];
+        }
+        else
+        {
+            piRet[i] = -1;
+        }
+    }
+
+    *returnSize = findNumsSize;
+
+    return piRet;
+}
+
+
+/*
+ *  leetcode 12:
+ *  Level    : esay
+ *  993. Cousins in Binary Tree
+ *  In a binary tree, the root node is at depth 0, and children of each depth k node are at depth k+1.
+ *
+ *  Two nodes of a binary tree are cousins if they have the same depth, but have different parents.
+ *
+ *  We are given the root of a binary tree with unique values, and the values x and y of two different nodes in the tree.
+ *
+ *  Return true if and only if the nodes corresponding to the values x and y are cousins.
+ *
+ *   Example 1:
+ *
+ *   Input: root = [1,2,3,4], x = 4, y = 3
+ *   Output: false
+ */
+
+/*
+ * @ desc: initBinaryTree
+ * @ in  :  
+ *          aiArr 
+ *          iSize
+ * @ out :
+ *         target binary tree
+ * @ cautious :
+ *  n pos in arr
+ *  child pos is 2n + 1, 2n + 2
+ *  
+ *          0
+ *      1       2
+ *    3   4   5   6
+ *  ...
+ *  Child poionter is null that arr value is 0.
+ */
+struct TreeNode* initBinaryTree(int aiArr[], int iSize)
+{
+    struct TreeNode *pstNode            = NULL;
+    struct TreeNode *pstLeft            = NULL;
+    struct TreeNode *pstRight           = NULL;
+    struct TreeNode *pstRoot            = NULL;
+    int             i                   = 0;
+    int             j                   = 0;
+
+    for (; i < iSize; i++)
+    {
+        if (0 == i)
+        {
+            /* as root */
+            if (!aiArr[0]) return NULL;
+            pstNode = malloc(sizeof(struct TreeNode));
+            memset(pstNode, 0, sizeof(struct TreeNode));
+            pstNode->val = aiArr[0];
+            pstNode->left = NULL;
+            pstNode->right = NULL;
+            pstRoot = pstNode;
+        }
+        else
+        {
+            if (0 == aiArr[i])
+            {
+                continue;
+            }
+            pstNode =  preTravel(pstRoot, aiArr[i]);
+            if (!pstNode) 
+            {
+                return NULL;
+            }
+        }
+
+        /* construct child */
+        if (iSize >= 2 * (i + 1) - 1)
+        {
+            if (aiArr[2 * i + 1])
+            {
+                pstLeft = malloc(sizeof(struct TreeNode));
+                memset(pstLeft, 0, sizeof(struct TreeNode));
+                pstLeft->val = aiArr[2 * i + 1];
+                pstNode->left = pstLeft;
+            }
+
+            if ((iSize >= 2 * (i + 1) ) && (aiArr[2 * i + 2]))
+            {
+                pstRight = malloc(sizeof(struct TreeNode));
+                memset(pstRight, 0, sizeof(struct TreeNode));
+                pstRight->val = aiArr[2 * i + 2];
+                pstNode->right = pstRight;
+            }
+        }
+    }
+    return pstRoot;
+}
+struct TreeNode* getBinNodeParent(struct TreeNode* root, int iVal)
+{
+    struct TreeNode*    pstNode             = NULL;
+    if (!root || (iVal == root->val))
+    {
+        return NULL;
+    }
+
+    if (root->left)
+    {
+        if (iVal == root->left->val) return root;
+        pstNode = getBinNodeParent(root->left, iVal);
+        if (pstNode) return pstNode;
+        pstNode = getBinNodeParent(root->right, iVal);
+        if (pstNode) return pstNode;
+    }
+    if (root->right)
+    {
+        if (iVal == root->right->val) return root;
+        pstNode = getBinNodeParent(root->left, iVal);
+        if (pstNode) return pstNode;
+        pstNode = getBinNodeParent(root->right, iVal);
+        if (pstNode) return pstNode;
+    }
+    return pstNode;
+}
+int getBinNodeHeight(struct TreeNode* root, int iVal)
+{
+    struct TreeNode*    pstNode             = NULL;
+    int                 iHeight             = 0;
+    if (root)
+    {
+        if (iVal == root->val) return iHeight;
+    }
+    if (root->left)
+    {
+        pstNode = preTravel(root->left, iVal);
+        if (pstNode) return (getBinNodeHeight(root->left, iVal) + 1);
+    }
+    if (root->right)
+    {
+        pstNode = preTravel(root->right, iVal);
+        if (pstNode) return (getBinNodeHeight(root->right, iVal) + 1);
+    }
+    return iHeight;
+
+}
+struct TreeNode* preTravel(struct TreeNode* root, int iVal)
+{
+    struct TreeNode*    pstNode             = NULL;
+    if (root)
+    {
+        if (iVal == root->val) return root;
+    }
+    if (root->left)
+    {
+        pstNode = preTravel(root->left, iVal);
+        if (pstNode) return pstNode;
+    }
+    if (root->right)
+    {
+        pstNode = preTravel(root->right, iVal);
+        if (pstNode) return pstNode;
+    }
+    return pstNode;
+
+}
+bool isCousins(struct TreeNode* root, int x, int y) {
+    int             iHx             = 0;
+    int             iHy             = 0;
+    struct TreeNode* px             = NULL;
+    struct TreeNode* py             = NULL;
+
+    iHx = getBinNodeHeight(root, x); 
+    iHy = getBinNodeHeight(root, y); 
+    
+    if (iHx != iHy) return false;
+    
+    px = getBinNodeParent(root, x);
+    py = getBinNodeParent(root, y);
+    
+    if (px == py) return false;
+    
+    return true; 
+}
+
+/*
+ *  leetcode 11:
+ *  Level    : mid
+ *  817. Linked List Components
+ *  We are given head, the head node of a linked list containing unique integer values.
+ *
+ *  We are also given the list G, a subset of the values in the linked list.
+ *
+ *  Return the number of connected components in G, where two values are connected if they appear consecutively in the linked list.
+ *
+ *  Example 1:
+ *
+ *  Input: 
+ *  head: 0->1->2->3
+ *  G = [0, 1, 3]
+ *  Output: 2
+ *  Explanation: 
+ *  0 and 1 are connected, so [0, 1] and [3] are the two connected components.
+ *  Example 2:
+ *
+ *  Input: 
+ *  head: 0->1->2->3->4
+ *  G = [0, 3, 1, 4]
+ *  Output: 2
+ *  Explanation: 
+ *  0 and 1 are connected, 3 and 4 are connected, so [0, 1] and [3, 4] are the two connected components.
+ */
+/* get all sub list in list */
+int numComponents(struct ListNode* head, int* G, int GSize) {
+    int*            piDumpG             = NULL;
+    int             iCount              = 0;
+    int             i                   = 0;
+    
+    struct ListNode* pstCurPos          = NULL;
+    struct ListNode* pstSort            = NULL;
+
+    assert((head != NULL) && (G != NULL));
+
+    piDumpG = malloc(GSize * sizeof(int));
+    pstCurPos   = head;
+    memset(piDumpG, 0, sizeof(int) * GSize);
+    memcpy(piDumpG, G, GSize * sizeof(int));
+
+    pstSort = SortList(head);
+
+    pstCurPos = pstSort;
+    qsort(piDumpG, GSize, sizeof(int), cmpn);
+
+    for (; i < GSize; i++)
+    {
+        /* find ele in list but not in G */        
+        if (pstCurPos->val != *(piDumpG + i))
+        {
+            /* find ele in G and in list as start pos */
+            while (pstCurPos->val != *(piDumpG + i))  /* must in */
+            {
+                pstCurPos = pstCurPos->next;
+            }
+            iCount++;
+            pstCurPos = pstCurPos->next;
+        }
+        else
+        {
+            if (!i) iCount++; /* process start pos is 0 */
+            pstCurPos = pstCurPos->next;
+        }
+    }
+    
+    free(piDumpG);
+    DestoryList(pstSort);
+    return iCount;
+}
+
+/*
+ *  leetcode 10:
+ *  Level    : easy
+ *  485. Max Consecutive Ones
+ *  Given a binary array, find the maximum number of consecutive 1s in this array.
+ *
+ *  Example 1:
+ *  Input: [1,1,0,1,1,1]
+ *  Output: 3
+ *  Explanation: The first two digits or the last three digits are consecutive 1s.
+ *      The maximum number of consecutive 1s is 3.
+ */
+
+int findMaxConsecutiveOnes(int* nums, int numsSize) {
+    int             iCount              = 0;
+    int             iTotalCount         = 0;
+    int             i                   = 0;
+
+    for (; i < numsSize; i++)
+    {
+        if (*(nums + i) == 1)
+            iCount++;
+        else
+        {
+            iTotalCount = ((iTotalCount > iCount) ? iTotalCount : iCount);
+            iCount = 0;
+        }
+    }
+    return ((iTotalCount > iCount) ? iTotalCount : iCount);
+    
+}
+int main(int argc, char* argv[])
+{
+    int             iRet                = 0;
+    iRet = hasAlternatingBits(4);
+    printf ("----node = [%d].\n", iRet);
+#if 0
+    struct TreeNode *pstNode            = NULL;
+    struct TreeNode *pstPNode           = NULL;
+    int             aiArr[]             = {1, 2, 3,0, 4,0, 5};
+    int             iRet                = 0;
+
+    pstNode = initBinaryTree(aiArr, sizeof(aiArr) / sizeof(int));
+    //iRet = getBinNodeHeight(pstNode, 5);
+    pstPNode = getBinNodeParent(pstNode, 5);
+    printf ("----node = [%d].\n", pstPNode->val);
+    int             aiArr1[]           = {0};
+    int             aiSub[]            = {0};
+    int             aiArr1[]           = {1, 2, 0, 4, 3};
+    int             aiSub[]            = {3, 4, 0, 2, 1};
+    int             aiArr1[]           = {3,11,2,10,17,8,0,6,18,1,5,16,12,14,7,13,19,4,15,9};
+    int             aiSub[]            = {4,8,9,14,13,10,15,19,5,16,0,17,1,2,6};
+    int             aiArr1[]           = {11,13,6,4,3,18,14,19,8,10,1,0,16,7,9,2,12,5,15,17};
+    int             aiSub[]            = {10,2,9,5,3,13,19,17,16,8,18,7,1};
+    int             aiArr1[]           = {0,3, 2, 4, 1};
+    int             aiSub[]            = {3, 0, 2};
+    int             aiArr1[]           = {0,1, 2, 3, 4};
+    int             aiSub[]            = {0, 3, 1, 4};
+    int             aiArr1[5]           = {1, 2, 0, 4, 3};
+    int             aiSub[5]            = {1, 2, 0, 4, 3};
+    int             iRet                = 0;
+    struct ListNode* pstL1              = NULL;
+
+    pstL1 = consList(aiArr1, sizeof(aiArr1) / sizeof(int));
+    //PrtList(pstL1);
+    iRet    = numComponents(pstL1, aiSub, sizeof(aiSub) / sizeof(int));
+    printf("hello c. iRet = [%d]\n", iRet);
+#endif
+
+
+#if 0
+    int             iArr[]              = {2,4,1,5,5,3,7,4,1,5};
+    int             iRet                = 0;
+    int             i                   = 0;
+    qsort(iArr, sizeof(iArr) / sizeof(int), sizeof(int), cmpn);
+
+    for(i=0; i < sizeof(iArr) / sizeof(int); i++)
+        printf("%d\t",iArr[i]);
+    
+    int             iArr[]              = {1,1,0,1,1,1};
+    int             iRet                = 0;
+
+    iRet    = findMaxConsecutiveOnes(iArr, sizeof(iArr) / sizeof(int));
+
+    printf("hello c. iRet = [%d]\n", iRet);
+#endif
+    return 0;
+}
