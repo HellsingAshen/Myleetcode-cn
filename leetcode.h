@@ -295,4 +295,25 @@ struct TreeNode* preTravel(struct TreeNode* root, int iVal)
     return pstNode;
 
 }
+
+struct TreeNode* postTravel(struct TreeNode* root)
+{
+    if (root->left) postTravel(root->left);
+    if (root->right) postTravel(root->right);
+    printf("%d ", root->val);
+    return root;
+}
+struct TreeNode* getFistNodeByPostTravel(struct TreeNode* pstRoot)
+{
+    return NULL;
+}
+struct TreeNode* getNextByPostTravel(struct TreeNode* pstRoot)
+{
+    struct TreeNode*    pstParentNode   = NULL;
+    if (pstRoot->left) return pstRoot->left;
+    if (pstRoot->right) postTravel(pstRoot->right);
+    pstParentNode = getBinNodeParent(pstRoot, pstRoot->val);
+    if (!pstParentNode) return NULL;
+    return getNextByPostTravel(pstParentNode);
+}
 #endif

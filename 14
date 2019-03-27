@@ -1,0 +1,429 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <assert.h>
+
+#include "leetcode.h"
+
+#define bool int
+struct TreeNode* preTravel(struct TreeNode* root, int iVal);
+/*
+ *  leetcode 20:
+ *  Level    : mid
+ *  227. Basic Calculator II
+ */
+int calculate(char* s) {
+    int             i           = 0;
+    int             iStart      = 0;
+    int             iCur        = 0; 
+    char*           pcSymbol    = NULL;
+    char*           acSymbol    = NULL;
+    char            acEle[16]   = {0};
+    void*           pEle        = NULL;
+    int*            piEle       = NULL;
+    int             iRet        = 0;
+    int             m           = 0;
+
+    pcSymbol = malloc(strlen(s)/2 + 1);
+    memset(pcSymbol, 0, strlen(s)/2 + 1);
+    acSymbol = pcSymbol;
+
+    /* 1. parse string to int and into arr */
+    /* 2. compute * / */
+    /* 3. compute + - */
+
+    pEle   = malloc(strlen(s) * sizeof(int));
+    memset(pEle, 0, sizeof(int) * strlen(s));
+
+    piEle = pEle;
+
+    for (; i < strlen(s); i++)
+    {
+        if (s[i] == ' ') 
+        {
+            continue;
+        }
+
+        if ((s[i] == '+')
+            || (s[i] == '-')
+            || (s[i] == '*')
+            || (s[i] == '/'))
+        {
+            memset(acEle, 0, sizeof(acEle));
+            memcpy(acEle, s + iStart, i - iStart);
+            piEle[iCur] = atoi(acEle); /* store ele */
+            
+            acSymbol[iCur] = s[i];
+            iCur++;
+            iStart = i + 1;
+        }
+    }
+
+    memset(acEle, 0, 16);
+    memcpy(acEle, s + iStart, strlen(s) - iStart);
+    piEle[iCur] = atoi(acEle); /* store last elem */
+  
+    for (i = 0; i < iCur; i++)
+    {
+        if ((acSymbol[i] == '+')
+            || (acSymbol[i] == '-'))
+        {
+            continue;
+        }
+        switch (acSymbol[i])
+        {
+            case '/':
+            {
+                piEle[i + 1] = piEle[i] / piEle[i+1];
+                piEle[i] = piEle[i+1];
+
+                /* refresh pre value */
+                for (m = i - 1; m > 0; m--)
+                {
+                    if ((acSymbol[m] == '*')
+                        || (acSymbol[m] == '/'))
+                    {
+                        piEle[m] = piEle[m + 1];
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                break;
+            }
+            case '*':
+            {
+                piEle[i + 1] = piEle[i] * piEle[i+1]; 
+                piEle[i] = piEle[i+1];
+                for (m = i - 1; m > 0; m--)
+                {
+                    if ((acSymbol[m] == '*')
+                        || (acSymbol[m] == '/'))
+                    {
+                        piEle[m] = piEle[m + 1];
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                break;
+            }
+            default:
+            {
+                break;
+            }
+        }
+    }
+
+    for (i = 0; i < iCur; i++)
+    {
+        if ((acSymbol[i] == '/')
+            || (acSymbol[i] == '*'))
+        {
+            continue;
+        }
+        switch (acSymbol[i])
+        {
+            case '+':
+            {
+                piEle[i + 1] = piEle[i] + piEle[i+1]; 
+                /* refresh next value */
+
+                for (m = i + 1; m < iCur; m++)
+                {
+                    if ((acSymbol[m] == '*')
+                        || (acSymbol[m] == '/'))
+                    {
+                        piEle[m + 1] = piEle[m];
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                break;
+            }
+            case '-':
+            {
+                piEle[i + 1] = piEle[i] - piEle[i+1]; 
+                for (m = i + 1; m < iCur; m++)
+                {
+                    if ((acSymbol[m] == '*')
+                        || (acSymbol[m] == '/'))
+                    {
+                        piEle[m + 1] = piEle[m];
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                break;
+                
+            }
+            default:
+            {
+                break;
+            }
+        }
+    }
+
+    iRet = piEle[iCur];
+    free (pEle);
+    free (pcSymbol);
+
+    return iRet;
+}
+
+/*
+ *  leetcode 19:
+ *  Level    : esay
+ *  581. Shortest Unsorted Continuous Subarray
+ *  Given an integer array, you need to find one continuous subarray that if you only sort this subarray in ascending order, then the whole array will be sorted in ascending order, too.
+ *
+ *  You need to find the shortest such subarray and output its length.
+ */
+
+int findUnsortedSubarray(int* nums, int numsSize) {
+/* TODO: fix */
+    int             iHash[10000] = {0};
+    int             i            = 0;
+    int             iLen         = 0;
+    int             iRet         = 0;
+
+    memset(iHash, 0, 10000 * sizeof(int));
+    for (; i < 10000; i++)
+    {
+
+    }
+
+    for (i = 0; i < numsSize; i++)
+    {
+        if (nums[i])
+        {
+            iHash[nums[i]]++;
+        }
+    }
+
+    iLen = 0;
+
+
+    for (i = 0; i < 10000 - 1; i++)
+    {
+        if (iHash[i])
+        {   
+            iLen++;
+        }
+        else
+        {
+            if (!iRet)
+            {       
+                iRet = iLen;
+                continue;
+            }
+            if (!iLen)
+            {
+                continue;
+            }
+            if (2 == iLen)
+            {
+                return 2;
+            }
+            if (iLen < iRet)
+            {
+                iRet = iLen;
+            }
+            iLen = 0;
+        }
+    }
+    return iRet; 
+}
+
+/*
+ *  leetcode 18:
+ *  Level    : esay
+ *  206. Reverse Linked List
+ */
+struct ListNode* reverseList(struct ListNode* head) {
+    struct ListNode* pstNode        = NULL;
+    struct ListNode* pstTmp         = NULL;
+    struct ListNode* pstTail        = NULL;
+
+    pstNode = head;
+    while (pstNode)
+    {
+        pstTmp = malloc(sizeof(*pstNode));
+        memset(pstTmp, 0, sizeof(*pstTmp));
+
+        pstTmp->val = pstNode->val;
+        pstTmp->next = pstTail;
+        pstTail = pstTmp;
+
+        pstNode = pstNode->next;
+    }
+    
+    return pstTail;
+}
+
+/*
+ *  leetcode 17:
+ *  Level    : esay
+ *  896. Monotonic Array
+ *  An array is monotonic if it is either monotone increasing or monotone decreasing.
+ *
+ *  An array A is monotone increasing if for all i <= j, A[i] <= A[j].  An array A is monotone decreasing if for all i <= j, A[i] >= A[j].
+ *
+ *  Return true if and only if the given array A is monotonic.
+ */
+bool isMonotonic(int* A, int ASize) {
+    int             i               = 0;
+    int             iAsc            = 0;
+    int             iDsc            = 0;
+
+    for (; i < ASize - 1; i++)
+    {
+        if (A[i] < A[i + 1])
+        {
+            if (iDsc) return false;
+            iAsc = 1;
+        }
+        else if (A[i] > A[i + 1])
+        {
+            if (iAsc) return false;
+            iDsc = 1;
+        }
+    }
+    return true;
+}
+
+/*
+ *  leetcode 16:
+ *  Level    : esay
+ *  268. Missing Number
+ *  Given an array containing n distinct numbers taken from 0, 1, 2, ..., n, find the one that is missing from the array.
+ */
+int missingNumber(int* nums, int numsSize) {
+    int             i               = 0;
+    int*            piHashVal       = malloc(sizeof(int) * (1 + numsSize));
+    memset(piHashVal, 0, (numsSize + 1) * sizeof(int));
+    
+    for (i = 0; i < numsSize; i++)
+    {
+        piHashVal[nums[i]] = 1;
+    }
+
+    for (i = 0; i < numsSize + 1; i++)
+    {
+        if (0 == piHashVal[i])
+        {
+            break;
+        }
+    }
+
+    free(piHashVal);
+
+    return i;
+}
+
+
+
+
+/*
+ *  leetcode 15:
+ *  Level    : esay
+ *  189. Rotate Array
+ *  Given an array, rotate the array to the right by k steps, where k is non-negative.
+ */
+void rotate(int* nums, int numsSize, int k) {
+    int             i               = 0;
+    int*            pi              = NULL;
+    
+    k = ((k > numsSize) ? (k % numsSize) : k);
+    i = numsSize - k;
+
+    pi  = malloc(sizeof(int) * k);
+    memset(pi, 0, sizeof(int) * k);
+    memcpy(pi, &nums[numsSize - k], k * sizeof(int));
+
+    while (i)
+    {
+        nums[i + k -1] = nums[i - 1];
+        i--;
+    }
+
+    memcpy(nums, pi, k * sizeof(int));
+    free(pi);
+    return;
+}
+
+/*
+ *  leetcode 14:
+ *  Level    : esay
+ *  283. Move Zeroes
+ *  Given an array nums, write a function to move all 0's to the end of it while maintaining the relative order of the non-zero elements.
+ *
+ *  Example:
+ *
+ *  Input: [0,1,0,3,12]
+ *  Output: [1,3,12,0,0]
+ */
+
+void prtArr(int* n, int num)
+{
+    for (int i = 0; i < num; i++)
+        printf("%d ", n[i]);
+    printf("\n");
+    
+}
+void moveZeroes(int* nums, int numsSize) {
+    int             i               = 0;
+    int             j               = 0;
+
+    j = numsSize;
+    for (; i < numsSize; i++)
+    {
+        if (nums[i]) 
+        {
+            continue;
+        }
+        else
+        {
+            for (j = i + 1; j < numsSize; j++)
+            {
+                if (nums[j]) 
+                {
+                    nums[i] = nums[j];
+                    nums[j] = 0;
+                    break;
+                }
+            }
+        }
+    }
+
+    return;
+}
+int main(int argc, char** args)
+{
+    //char*           pcExpr              = "3+2*2";
+    //char*           pcExpr              = " 3/2 ";
+    //char*           pcExpr              = " 3+5 / 2 ";
+    //char*           pcExpr              = " 100000000/1/2/3/4/5/6/7/8/9/10";
+    //char*           pcExpr              = "0-2147483647";
+    char*           pcExpr              = "1+2*5/3+6/4*2";
+    int             iRet                = 0;
+
+    iRet = calculate(pcExpr);
+    printf("ret = [%d].\n", iRet);
+#if 0
+    int             aiArr[] = {1,2};
+    rotate(aiArr, sizeof(aiArr) / sizeof(int), 3);
+    for (int i = 0; i < sizeof(aiArr) / sizeof(int); i++)
+    printf("%d ", aiArr[i]);
+    moveZeroes(aiArr, sizeof(aiArr) / sizeof(int));
+#endif
+
+    return 0;
+}
