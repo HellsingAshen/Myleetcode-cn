@@ -1,0 +1,461 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <assert.h>
+#include <stdint.h>
+
+#include "leetcode.h"
+
+#define bool int
+
+/*
+ * leetcode 28:
+ * Level    : esay
+ * 925. Long Pressed Name
+ */
+
+bool isLongPressedName(char* name, char* typed) {
+    int             i               = 0;
+    int             j               = 0;
+
+    if (strlen(typed) < strlen(name)) return false;
+
+    for (; (j < strlen(typed)) && (i < strlen(name)) && (i >= 0); i++, j++)
+    {
+        if (name[i] == typed[j])    continue;
+        i--;
+        if ((i < 0) || (name[i] != typed[j]) )    return false;
+    }
+
+    if (i != strlen(name)) return false;
+
+    return true;
+}
+
+bool isLongPressedName1(char* name, char* typed) {
+    int             i               = 0;
+    int             j               = 0;
+
+    if (strlen(typed) < strlen(name)) return false;
+
+    for (; (j < strlen(typed)) && (i < strlen(name)); i++, j++)
+    {
+        if (name[i] != typed[j])
+        {
+            if (!j) return false;
+            if (typed[j] == name[i - 1])
+            {
+                j++;
+                while (typed[j] == name[i - 1]) 
+                {
+                    j++;
+                }
+                if (typed[j] != name[i])
+                {
+                    return false;
+                }
+            }
+            else 
+            {
+                return false;
+            }
+        }
+    }
+    if (i != strlen(name))  return false;
+
+    /* process last words */
+    if (j != strlen(typed))
+    {
+        for (; j < strlen(typed); j++)
+        {
+            if (typed[j] != name[i - 1]) return false;
+        }
+    }
+    return true;
+}
+
+
+/*
+ * leetcode 27:
+ * Level    : esay
+ * 557. Reverse Words in a String III
+ */
+char* reverseWords(char* s) {
+    /* 1. split n words by space */
+    /* 2. reset start pos and end pos */
+    /* 3. reverse word */
+
+    int             i               = 0;
+    int             j               = 0;
+    int             iS              = 0; /* start pos */
+    int             iE              = 0; /* end pos */
+    char*           pcRev           = malloc(strlen(s) + 1);
+    char*           pcPos           = NULL;
+    char*           pcLast          = NULL;
+    char            cC              = 0;
+    memset(pcRev, 0, strlen(s)+1);
+    strcpy(pcRev, s);
+    
+    for (pcPos = strstr(pcRev, " "); pcPos; pcPos++, pcPos = strstr(pcPos, " "), iS = iE + 1)
+    {
+        iE = strlen(s) - strlen(pcPos);
+        for (i = iS, j = iE - 1; i < j; i++, j--)
+        {
+            cC = pcRev[i];
+            pcRev[i] = pcRev[j];
+            pcRev[j] = cC;
+        }
+        pcLast = pcPos;
+    }
+    /* pro the last */
+    printf("%s.\n", pcLast);
+    if(!pcLast)
+    {
+        pcLast = pcRev;
+    }
+    else
+    {
+        pcLast++;
+    }
+    for (i = 0, j = strlen(pcLast) - 1; i < j; i++, j--)
+    {
+        cC = pcLast[i];
+        pcLast[i] = pcLast[j];
+        pcLast[j] = cC;
+    }
+
+    return pcRev;
+}
+
+/*
+ * leetcode 26:
+ * Level    : esay
+ * 1012. Complement of Base 10 Integer
+ *
+ */
+int bitwiseComplement(int N) {
+    int             iLen            = 0;
+    int             j               = 0;
+
+    if (!N) return 1;
+
+    j = N;
+    while (j)
+    {
+        iLen++;
+        j >>= 1;
+    }
+    j = (1<<iLen) - 1;
+
+    return (~N & j);
+}
+
+/*
+ * leetcode 25:
+ * Level    : esay
+ * 191. Number of 1 Bits
+ *
+ */
+int hammingWeight(uint32_t n) {
+    if (n)
+    {
+        return hammingWeight(n>>1) + ((n%2) ? 1 : 0); 
+    }
+    else
+    {
+        return 0;
+    }
+}
+int hammingWeight1(uint32_t n) {
+    int             iRet                = 0;
+    uint32_t        uiMid               = 0;
+
+    uiMid = n;
+    while (uiMid)
+    {
+        if (uiMid % 2) iRet++;
+        uiMid = uiMid>>1;
+    }
+    
+    return iRet;
+}
+
+/*
+ * leetcode 24:
+ * Level    : esay
+ * 242. Valid Anagram
+ *
+ */
+bool isAnagram(char* s, char* t) {
+
+    if (strlen(s) != strlen(t)) return false; 
+
+    char*           pcS1                = malloc(strlen(s) + 1);
+    memset(pcS1, 0, strlen(s) + 1);
+    char*           pcS2                = malloc(strlen(s) + 1);
+    memset(pcS2, 0, strlen(s) + 1);
+
+    strcpy(pcS1, s);
+    strcpy(pcS2, t);
+    qsort(pcS1, strlen(s), sizeof(char), cmpc);
+    qsort(pcS2, strlen(s), sizeof(char), cmpc);
+
+    /* TODO: free */
+    return (!strcmp(pcS1, pcS2));
+}
+bool isAnagram1(char* s, char* t) {
+    /* case 1: hash */
+    /* case 2: sort */
+    
+    if (strlen(s) != strlen(t)) return false; 
+
+    int             aiS[26 + 1]         = {0};
+    int             aiT[26 + 1]         = {0};
+    int             i                   = 0;
+
+    for (; i < strlen(s); i++)
+    {
+        if (s[i]) aiS[s[i] - 'a']++;
+        if (t[i]) aiT[t[i] - 'a']++;
+    }
+    
+
+    for (i = 0; i < 26; i++)
+    {
+        if (aiS[i] != aiT[i]) return false;
+    }
+    
+    return true; 
+}
+/*
+ * leetcode 23:
+ * Level    : esay
+ * 9. Palindrome Number
+ *
+ */
+bool isPalindrome(int x) {
+    int             i                   = 0;
+    int             j                   = 0;
+    for (i = x; i > 0; i = i / 10)
+    {
+        j = j * 10;
+        j += i % 10;
+    }
+    return (j == x);
+}
+
+bool isPalindrome2(int x) {
+    char            acStr[10 + 1]       = {0};
+    int             i                   = 0;
+    int             j                   = 0;
+    
+    if ((x < 0) || (x == 10)) return false;
+    if (x < 10) return true;
+
+    sprintf(acStr, "%d", x);
+
+    for (i = 0, j = strlen(acStr) - 1; i < j; i++, j--)
+    {
+        if (acStr[i] != acStr[j])
+            return false; 
+    }
+
+    return true;
+}
+bool isPalindrome1(int x) {
+    /* 1. get hight pos */
+    /* 2. get low pos */
+    int             iHight              = 0;
+    int             iLow                = 0;
+    int             m                   = 0;
+    int             l                   = 1;
+    
+    if ((x < 0) || (x == 10)) return false;
+    if (x < 10) return true;
+
+    while (l <= (x) / 10)
+    {
+        l *= 10;
+    }
+    
+    m = x; 
+
+    iLow = m % 10;
+    iHight = m/(l);
+    m = ((m/10) - (l / 10) * iHight); /* next val */
+    l = l / 100;
+
+    while (m)
+    {
+        if (iLow != iHight)
+        {
+            return false;
+        }
+        if (m == 1) return true;
+        iLow = m % 10;
+        iHight = m/(l);
+        m = ((m/10) - (l / 10) * iHight); /* next val */
+        l = l / 100;
+    }
+    
+    return (iHight == iLow) ? true : false;
+}
+/*
+ * leetcode 22:
+ * Level    : esay
+ * 804. Unique Morse Code Words
+ *
+ */
+
+int uniqueMorseRepresentations(char** words, int wordsSize) {
+
+    if (wordsSize == 0)  return 0;
+    if (wordsSize == 1)  return 1;
+
+    char*           acPwd[]           = {".-","-...","-.-.","-..",".","..-.","--.",  
+                                            "....","..",".---","-.-",".-..","--","-.", 
+                                            "---",".--.","--.-",".-.","...","-","..-",
+                                            "...-",".--","-..-","-.--","--.."};
+    char**          ppMorse             = NULL;
+    
+    ppMorse = malloc(sizeof(char*) * (wordsSize));
+    memset(ppMorse, 0, (wordsSize) * sizeof(char*));
+
+    char**          apcMorse           = NULL;
+    char*           pcTmp               = NULL;
+    int             i                   = 0;
+    int             j                   = 0;
+    int             iLen                = 0;
+    int             iCount              = 0;
+    apcMorse = ppMorse;
+ 
+    /* 1. convert to morse str */
+    /* 2. postTravel */
+    for (; i < wordsSize; i++)
+    {
+        pcTmp = malloc(4 * strlen(words[i]) + 1); 
+        memset(pcTmp, 0, 4 * strlen(words[i]) + 1);
+        for (j = 0, iLen = 0; j < strlen(words[i]); j++)
+        {  
+            memcpy(pcTmp + iLen, acPwd[words[i][j] - 'a'], strlen(acPwd[words[i][j] - 'a']));
+            iLen += strlen(acPwd[words[i][j] - 'a']);
+        }
+        *(apcMorse + i) = pcTmp;
+        pcTmp = NULL;
+    }
+
+    for (i = 0; i < wordsSize; i++)
+    {
+        for (j = i + 1; j < wordsSize; j++)
+        {
+            if (!strcmp(apcMorse[i], apcMorse[j]))
+            {
+                break;
+            }
+        }
+        if (j == wordsSize)
+        {
+            iCount++;
+        }
+
+    }
+
+    for (i = 0; i < wordsSize; i++)
+    {
+        free(ppMorse[i]);
+    }
+
+    free(ppMorse);
+    return iCount;
+}
+
+/*
+ * leetcode 21:
+ * Level    : esay
+ * 693. Binary Number with Alternating Bits
+ */
+
+int binaryGap(int N) {
+    int             iLen                = 0;
+    int             iPos                = 0;
+    int             i                   = 0;
+    int             j                   = 0;
+    int             k                   = 0;
+    /* 1. find 1th pos */
+    /* 2. find next pos , set len and do loop by step 2 */
+
+    j = N;
+
+    while (j) 
+    {
+        i = j & 0x1;
+        j = j>>1;
+
+        if (!iLen)
+        {
+            if (i)
+            {
+                iLen = iPos = 1;
+            }
+        }
+        else
+        {
+            if (!i)
+            {
+                iPos++;
+            }
+            else
+            {
+                if (iPos > iLen)
+                {
+                    iLen = iPos;
+                }
+                k = 1;
+                iPos = 1;
+            }
+        }
+    }
+    if ((!k)&&(iLen = 1)) return 0;
+
+    return iLen;
+}
+int main(int argc, char** args)
+{
+    char*               p                   = "pyplrz";
+    char*               q                   = "ppyypllr";
+    int                 iRet                = 0;
+
+    iRet    =  isLongPressedName(p, q);
+    printf("%d", iRet);
+#if 0
+    char*               pc                  = NULL;
+
+    //pc =     reverseWords("Let's take LeetCode contest");
+    pc =     reverseWords("hehhhhhhe");
+    printf("[%s]", pc);
+    
+    int                 iRet                = 0;
+    iRet = bitwiseComplement(0);
+    int                 iRet                = 0;
+    char*               s                   = "anagram";
+    char*               t                   = "nagaram";
+
+    iRet = isAnagram(s, t);
+    printf("%d", iRet);
+
+    int                 iRet                = 0;
+    iRet = isPalindrome(9999);
+    printf("%d", iRet);
+    char*               apcTc[5] = {"kyhp","ywhp","cxzb","cdtzb","cnazb"};
+    //char*               apcTc[4] = {"gin", "zen", "gig", "msg"};
+    char**              ppTc     = apcTc;
+    
+    int                 iRet                = 0;
+    iRet = uniqueMorseRepresentations(ppTc, 5);
+    printf("%d", iRet);
+    int             iRet                = 0;
+    iRet = binaryGap(22);
+    printf("%d", iRet);
+#endif
+    return 0;
+}

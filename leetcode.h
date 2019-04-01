@@ -48,10 +48,15 @@ sortn(int* pi, int iSize)
     return;
 }
 
-static int
-cmpn(const void *p1, const void *p2)
+static int cmpn(const void *p1, const void *p2)
 {
     return (*(int*)p1 - *(int*)p2);
+}
+
+static int cmpc(const void *p, const void *q)
+{
+    return (*(char*)p - *(char*)q);
+
 }
 
 struct ListNode*  consList(int* pi, int iCount)
