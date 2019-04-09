@@ -48,6 +48,10 @@ sortn(int* pi, int iSize)
     return;
 }
 
+static int cmpstrlen(const void *p1, const void *p2)
+{
+    return (strlen((char*)p1) - strlen((char*)p2));
+}
 static int cmpn(const void *p1, const void *p2)
 {
     return (*(int*)p1 - *(int*)p2);
@@ -158,6 +162,24 @@ void DestoryList(struct ListNode* head)
     }
 
 }
+/* 
+ * reverse string 
+ */
+char *strrev(char *str)
+{
+      char *p1, *p2;
+
+      if (! str || ! *str)
+            return str;
+      for (p1 = str, p2 = str + strlen(str) - 1; p2 > p1; ++p1, --p2)
+      {
+            *p1 ^= *p2;
+            *p2 ^= *p1;
+            *p1 ^= *p2;
+      }
+      return str;
+}
+
 #if DESC("binary_tree")
 
 /*

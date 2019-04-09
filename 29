@@ -1,0 +1,614 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <assert.h>
+#include <stdint.h>
+
+#include "leetcode.h"
+
+#define bool int
+char *strrev(char *str);
+/*
+ * leetcode 33:
+ * Level    : mid
+ * 3. Longest Substring Without Repeating Characters
+ */
+#define MAP_SIZE 128
+int lengthOfLongestSubstring(char* s) {
+    int             iCount              = 0;
+    int             aiMap[MAP_SIZE]           = {0};
+    int             iMaxLen             = 0;
+
+    int             i                   = 0;
+    int             j                   = 0;
+    int             iLen                = 0;
+
+    iLen = strlen(s);
+    /* for testcase len > 10000 */
+     if (iLen > 10000) iLen = iLen/4;
+    */
+
+    for (j = 0; j < iLen; j++)
+    {
+        for (i = j; i < iLen; i++)
+        {
+
+            if (aiMap[s[i]])
+            {
+                break;
+            }
+            else
+            {
+                iCount++;
+                aiMap[s[i]]++;
+            }
+            
+        }
+        if (iMaxLen < iCount)
+        {
+            iMaxLen = iCount;
+        }
+        iCount = 0;
+        memset(aiMap, 0, MAP_SIZE * sizeof(int));
+    }
+
+    return iMaxLen;
+}
+
+int lengthOfLongestSubstring1(char* s) {
+    int             iCount              = 0;
+    int             aiMap[MAP_SIZE]           = {0};
+    int             iMaxLen             = 0;
+
+    int             i                   = 0;
+    int             j                   = 0;
+
+    
+    for (j = 0; j < strlen(s); j++)
+    {
+        for (i = j; i < strlen(s); i++)
+        {
+
+            if (aiMap[s[i]])
+            {
+                /* reset */
+                if (0 == iMaxLen)
+                {
+                    iMaxLen = iCount;
+                }
+                else if (iCount > iMaxLen) 
+                {
+                    iMaxLen = iCount;
+                }
+                memset(aiMap, 0, MAP_SIZE * sizeof(int));
+                iCount = 0;
+                i--;
+            }
+            else
+            {
+                iCount++;
+                aiMap[s[i]]++;
+            }
+            
+        }
+        if (iMaxLen < iCount)
+        {
+            iMaxLen = iCount;
+        }
+        iCount = 0;
+        memset(aiMap, 0, MAP_SIZE * sizeof(int));
+    }
+
+    return iMaxLen;
+}
+
+/*
+ * leetcode 32:
+ * Level    : esay
+ * 21. Merge Two Sorted Lists
+ *
+ */
+struct ListNode* mergeTwoLists(struct ListNode* l1, struct ListNode* l2) {
+    struct ListNode*    pstL1       = NULL;
+    struct ListNode*    pstL2       = NULL;
+    struct ListNode*    pstL3       = NULL;
+    struct ListNode*    pstRet      = NULL;
+    struct ListNode*    pstTmp      = NULL;
+
+    for (pstL1 = l1, pstL2 = l2; pstL2 && pstL1;)
+    {
+        pstTmp = malloc(sizeof(struct ListNode));
+        memset(pstTmp, 0, sizeof(struct ListNode));
+        pstTmp->next = NULL;
+        if (pstL1->val < pstL2->val)
+        {
+            pstTmp->val = pstL1->val;
+            pstL1 = pstL1->next;
+        }
+        else
+        {
+            pstTmp->val = pstL2->val;
+            pstL2 = pstL2->next;
+        }
+
+        if (!pstL3)
+        {
+            pstL3 = pstTmp;
+            pstRet = pstTmp;
+        }
+        else
+        {
+            pstL3->next = pstTmp;
+            pstL3 = pstTmp;
+            pstTmp = NULL;
+        }
+    }
+
+    /* pro left */
+    while (pstL1)
+    {
+        pstTmp = malloc(sizeof(struct ListNode));
+        memset(pstTmp, 0, sizeof(struct ListNode));
+        pstTmp->next = NULL;
+        pstTmp->val = pstL1->val;
+        pstL1 = pstL1->next;
+
+        if (!pstL3)
+        {
+            pstL3 = pstTmp;
+            pstRet = pstTmp;
+        }
+        else
+        {
+            pstL3->next = pstTmp;
+            pstL3 = pstTmp;
+            pstTmp = NULL;
+        }
+    }
+
+    while (pstL2)
+    {
+        pstTmp = malloc(sizeof(struct ListNode));
+        memset(pstTmp, 0, sizeof(struct ListNode));
+        pstTmp->next = NULL;
+        pstTmp->val = pstL2->val;
+        pstL2 = pstL2->next;
+
+        if (!pstL3)
+        {
+            pstL3 = pstTmp;
+            pstRet = pstTmp;
+        }
+        else
+        {
+            pstL3->next = pstTmp;
+            pstL3 = pstTmp;
+            pstTmp = NULL;
+        }
+    }
+    
+    return pstRet;
+}
+
+
+/*
+ * leetcode 31:
+ * Level    : esay
+ * 520. Detect Capital
+ */
+bool detectCapitalUse(char* word) {
+    int             iRet             = 0;
+    int             i                = 0;
+    if (!strlen(word)) return false;
+    if (1 == strlen(word)) return true;
+
+    if ((word[0] >= 'a') && (word[0] <= 'z'))
+    {
+        for (i = 1; i < strlen(word); i++)
+        {
+            if (!((word[i] >= 'a') && (word[i] <= 'z'))) return false;
+        }
+    }
+    else if ((word[0] >= 'A') && (word[0] <= 'Z'))
+    {
+        
+        if ((word[1] >= 'a') && (word[1] <= 'z'))
+        {
+            for (i = 2; i < strlen(word); i++)
+            {
+                if (!((word[i] >= 'a') && (word[i] <= 'z'))) return false;
+            }
+        }
+        else if ((word[1] >= 'A') && (word[1] <= 'Z'))
+        {
+            for (i = 2; i < strlen(word); i++)
+            {
+                if (!((word[i] >= 'A') && (word[i] <= 'Z'))) return false;
+            }
+        }
+        else
+        {
+            return false;
+        }
+    }
+    else
+    {
+        return false;
+    }
+
+    return true;
+    
+}
+
+/*
+ * leetcode 30:
+ * Level    : esay
+ * 680. Valid Palindrome II
+ * TODO: 
+ */
+bool validPalindrome(char* s) {
+    int             aiHash[26]      = {0};
+    int             i               = 0;
+    int             j               = 0;
+    int             iCount          = 0;
+    int             iSkip           = 0;
+    int             iRet            = 0;
+    char*           pcTmp          = NULL;
+    char*           pcTmp1          = NULL;
+    char*           pcRev          = NULL;
+
+    if (strlen(s) <= 2) return true;
+    /* 1. check first  */
+#if 0
+    for (; i < strlen(s); i++)
+    {
+        aiHash[s[i] - 'a']++;
+    }
+
+    for (; j < 26; j++)
+    {
+        if (aiHash[j] & 0x1)
+        {
+            iCount++;
+        }
+    }
+    if ((iCount > 2) || ((2 == iCount) && (1 & strlen(s)))) return false;
+#endif
+
+    /* 2. chech second by diff char little than 2. */
+    /* skip method */
+    for (i = 0, j = strlen(s) - 1; i < j;)
+    {
+        while ((s[i] == s[j]) && (i < j)){i++; j--;}
+        if (i >= j) break;
+
+        if (i + 1 == j) 
+        {
+            iSkip++;
+            break;
+        }
+        else if ((s[i + 1] == s[j])
+             && (s[i] != s[j - 1]))
+        {
+            i++;
+            iSkip++;
+        }
+        else if ((s[i] == s[j - 1])
+             && ((s[i + 1] != s[j])))
+        {
+            j--;
+            iSkip++;
+        }
+        else if ((s[i] == s[j - 1])
+             && ((s[i + 1] == s[j])))
+        {
+            iSkip++;
+            /* try twice */
+            pcTmp = malloc(j - i + 1);
+            memset(pcTmp, 0, j - i + 1);
+            memcpy(pcTmp, &s[i], j - i);/* front */
+
+            pcTmp1 = malloc(j - i + 1);
+            memset(pcTmp1, 0, j - i + 1);
+            strcpy(pcTmp1, pcTmp);
+
+            pcRev = strrev(pcTmp);
+            if (strcmp(pcRev, pcTmp1))
+            {
+                memset(pcTmp, 0, j - i + 1);
+                memcpy(pcTmp, &s[i + 1], j - i);/* rear */
+
+                pcTmp1 = malloc(j - i + 1);
+                memset(pcTmp1, 0, j - i + 1);
+                strcpy(pcTmp1, pcTmp);
+
+                pcRev = strrev(pcTmp);
+                if (strcmp(pcRev, pcTmp1))
+                {
+                    iSkip++;
+                    break;
+                }
+
+            }
+            break;
+        }
+        else
+        {
+            iSkip = 998;
+            break;
+        }
+    }
+    
+    if (pcTmp1) {
+        free(pcTmp1); 
+        pcTmp1 = NULL;
+    }
+    if (pcTmp) {
+        free(pcTmp); 
+        pcTmp = NULL;
+    }
+    printf("Skip = [%d]\n", iSkip);
+    if (iSkip > 1) return false;
+
+    return true;
+}
+
+
+/*
+ * leetcode 29:
+ * Level    : esay
+ * 720. Longest Word in Dictionary
+ */
+static void
+sortLen(char** pps, int iSize)
+{
+    int             i               = 0;
+    int             j               = 0;
+    char*           m               = NULL;
+    for (i = 0; i < iSize; i++)
+    {
+        for (j = i + 1; j < iSize; j++)
+        {
+            if (strlen(pps[i]) > strlen(pps[j])) /* asc */
+            {
+                m = pps[i]; pps[i] = pps[j]; pps[j] = m;
+            }
+            if (strlen(pps[i]) == strlen(pps[j]))
+            {
+                if (strcmp(pps[i], pps[j]) > 0)
+                {
+                    m = pps[i]; pps[i] = pps[j]; pps[j] = m;
+                }
+            }
+        }
+    }
+    return;
+}
+
+int isFullWord(char**words, int wordsSize, int i)
+{
+    
+    int             iFit            = 0;
+    int             j               = 0;
+    int             k               = 0;
+    for (j = 0; j < strlen(words[i]); j++)
+    {   
+        for (k = 0,iFit = 0; k < wordsSize; k++)
+        {   
+            if (!strncmp(words[i], words[k], j + 1) && (j + 1 == strlen(words[k])))
+            {   
+                iFit = 1;
+                break;
+            }
+        }
+        if (!iFit)
+        {
+            /*  not find it */
+            break;
+        }
+    }
+
+    if (j != strlen(words[i]))
+    {
+        return 0;
+    }
+
+    return 1;
+}
+
+char* longestWord(char** words, int wordsSize) {
+    /* 1. sort words by length */
+    /* 2. judge by sub str */
+    int             i               = 0;
+    int             iFit            = 0;
+    int             j               = 0;
+    int             k               = 0;
+    int             m               = 0;
+    int             iRet            = 0;
+
+    sortLen(words, wordsSize);
+
+    for (i = wordsSize - 1; i >= 0; i--)
+    {
+        iRet = isFullWord(words, wordsSize,i);
+        if (iRet)
+        {
+            for (j = i - 1, k = i; (j >= 0) && (strlen(words[j]) == strlen(words[k])); j--)
+            {
+                if (strcmp(words[j], words[k]) < 0)
+                {
+                    iRet = isFullWord(words, wordsSize, j);
+                    if (iRet)
+                    {
+                        k = j;
+                    }
+                }
+            }
+            return words[k];
+        }
+    }
+
+    return NULL;
+}
+
+/*
+ * leetcode 28:
+ * Level    : esay
+ * 455. Assign Cookies
+ */
+
+int findContentChildren(int* g, int gSize, int* s, int sSize) {
+    int             i               = 0;
+    int             iStart          = 0;
+    int             j               = 0;
+    int             iCount          = 0;
+    qsort(g, gSize, sizeof(int), cmpn);
+    qsort(s, sSize, sizeof(int), cmpn);
+   
+    for (; i < gSize; i++)
+    {
+        for (j = iStart; j < sSize; j++)    
+        {
+            if (g[i] <= s[j])
+            {
+                iCount++;
+                iStart = j + 1;
+                break;
+            }
+        }
+    }
+    return iCount;
+}
+/* use hash when data is lager ,then malloc failed */
+int findContentChildren1(int* g, int gSize, int* s, int sSize) {
+    int             iMaxG           = 0;
+    int             iMaxS           = 0;
+    void            *pHashG         = NULL;
+    void            *pHashS         = NULL; 
+    int             *piHashG        = NULL;
+    int             *piHashS        = NULL; 
+    int             i               = 0;
+    int             j               = 0;
+    int             iCount          = 0;
+    int             iStart          = 0;
+
+    /* 1. construct 2 hash arrays */
+    /* 2. do it */
+    if (!sSize) return 0;
+
+    for (; i < gSize; i++)
+    {
+        /* get max value */
+        if (iMaxG < g[i]) iMaxG = g[i];
+    }
+
+    for (; j < sSize; j++)
+    {
+        /* get max value */
+        if (iMaxS < s[j]) iMaxS = s[j];
+    }
+    pHashS = malloc(sizeof(int) * (iMaxS + 1) + 1); 
+    memset(pHashS, 0, sizeof(int) * (iMaxS + 1) + 1);
+    piHashS = pHashS;
+    
+    pHashG = malloc(sizeof(int) * (iMaxG + 1) + 1); 
+    memset(pHashG, 0, sizeof(int) * (iMaxG + 1) + 1);
+    piHashG = pHashG;
+
+    for (i = 0; i < gSize; i++)
+    {
+        if (g[i])
+        {
+            piHashG[g[i]]++; 
+        }
+    }
+
+    for (j = 0; j < sSize; j++)
+    {
+        if (s[j])
+        {
+            piHashS[s[j]]++;  /* target maps */
+        }
+    }
+
+    for (j = 0,i = 0; (j <= iMaxG) && (i <= iMaxS); j++, i = j)
+    {
+        while (piHashG[j])
+        {
+            while ((i <= iMaxS) && !piHashS[i])
+            {
+                i++;
+            }
+
+            if (i != iMaxS + 1)
+            {
+                iCount++;
+                piHashS[i]--;
+            }
+
+            piHashG[j]--;
+        }
+    }
+    
+    free(pHashG);
+    free(pHashS);
+    return iCount;
+}
+
+char *strrev(char *str)
+{
+      char *p1, *p2;
+
+      if (! str || ! *str)
+            return str;
+      for (p1 = str, p2 = str + strlen(str) - 1; p2 > p1; ++p1, --p2)
+      {
+            *p1 ^= *p2;
+            *p2 ^= *p1;
+            *p1 ^= *p2;
+      }
+      return str;
+}
+
+int main(int argc, char** args)
+{
+    int             iRet                = 0;
+    //char*           pcStr               = "abcabcbb";
+    //char*           pcStr               = "bbbbb";
+    //char*           pcStr               = "pwwkew";
+    //char*           pcStr               = " ";
+    //char*           pcStr               = "   ";
+    //char*           pcStr               = "aabaab!bb";
+    char*           pcStr               = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ abcdefghijklmnopqrstuvwxyzABCD";
+
+
+    iRet = lengthOfLongestSubstring(pcStr);
+
+    printf("%d\n", iRet);
+#if 0
+    //char*           pcStr               = "aaaxa";
+    //char*           pcStr               = "abca";
+    //char*           pcStr               = "aba";
+    //char*           pcStr               = "aguokepatgbnvfqmgmlcupuufxoohdfpgjdmysgvhmvffcnqxjjxqncffvmhvgsymdjgpfdhooxfuupuculmgmqfvnbgtapekouga";
+    //char*           pcStr               = "ebcbbececabbacecbbcbe";
+    //char*           pcStr               = "eedede";
+    //char*           pcStr               = "pidbliassaqozokmtgahluruufwbjdtayuhbxwoicviygilgzduudzgligyviciowxbhuyatdjbwfuurulhagtmkozoqassailbdip";
+    char*           pcStr               = "fovakfrwgdwidwtrgumdpypljmusgeepmhxqceqdpdokpjeoytqqbrrvvhsgggxggndawvaovlqsbnljrxbgwwjizdatgsafwwkmrkclljlnmksnloqfuxjqavultxjlnocsmtcaklboieftqxxvnszapvpogoxbjfomiyoxmaajpbqhbnafssgyaqixdzwwskpiopuloghzoyyzamxwqtcbiwmbftjhwugvvgutlzbjfaxszddnbvtblcfuywpsfljjlazantqqjktdfjcxbaskhhiphhtcpewhpwxanoiqelwakzycughskonrneqfkwvqglbxtovalsbcudpfvryweayfxpofehiuvhsqfezuiexcejddgmdppfeyrscvvwjbiwzmzqpxpilblmllkjbwhyiqivztihrjmhhwdkkxnmxhfulfhbuvvhttdppwrvgoiqrwxvucpdrwhuncixmultwyatyzmyyyhwzxuiikavqmmxggpcgfacvmexerlcymprkhevkveaauwfqbxbpnwiwqcooplvrmawoffeeaotsuucqatubnggurzjztavqysbuyclibxrtjqoaeppcyxxstlvlpopaebrxdoeecsjohfmmonymjlaxfsxnflbpinlwlaqqdmwpiunsjkhatmoogvhkqonrwxfsibenicwstklsqndemfynfclnbbkxxjhkepubgvydicoalopzkmggabnyhysztuyhibxotbhpgkkyirehsptoaubrsqqvfifdgfznqmfwumzungupjkkazqdiszezwkblpecmjspsguromtjodfnlxpreqeifbgswqtdfdeonahkrydhufzumwtldrveasrfugvnozxtdpxqldxksxyvgkdcpsrsaqttbjalzorvhnawoyxafdddeyhcvwsavpvpdmxxlaxilxpmygheyvmihcquiyorszlndzylsurymwpybudtpuqxoajtmsmkbhhrspycvzuglrlbqdvkoxqmkjjftllqsqfhlbmrgnkuymlprlmgbvkscuagxppgibcxqzsnlnjgnaxtcydxjqlejtlkornunsvgenhvixarqwxjfcvtkeujlrgxzswmzmqjpunoodqxtjlljualoxzzcbdkjjnafodmgovzalkecvzhdtduwmkddkokrwuqkffvuckbbpqxszhevmisttzsoypjnzgyxhmpdsnposktnedsntjhjrdurmapwvogzahghrmesnrogxwirdcnkfrgjaalzycuubebtjxlgoqjssmshusnzquempfzewybbqybkyhnhpkbgjjhglrsrmvrwwbbcnzvztsaxtnzoguixklrmdqjuxmgksllbaeufccpqsrmnyoseabxysbfeayysbmekssvaowqvqxifvsjlpevkhbeunsgkdebdqcijgpauanrttuenymsibpujdrbxxuggfdcaejrwxypayrllxfkvmzjesijivbjfbqblvgxzlnwywduieeerrczokcdosavwsvumidbpztbqkzatmhseognnqmkvvltclcojkdbssfwpxbqmladqvskuhtxavqrxrnwtzqflgvjcnxgucgpmctdjevdpjeyhqaxkvqnptqbqdxufssgyeenwzmycyvcpzolagvwnrkuvuzxpodmtsofistzaocwtdpcvcxjhpzpdlzxjzgomnuydkxsihnqssmfnshrzkzhguggmsczxrjoccgpvokuhsjpuulolfcjqnbodawdxlclphyuzfzgjcycowvsugznnrpovlglyeluknwjkdxccbebxmndnvcsxzdsvcbwrpwoqeazadonnxkcnorzuiynezwwqdmhjvminrddyigteweajrefyvrjjfnxhskyxfqlqswrvlosztbqpaftkjtqamngvgfjntqispaltmvnvqoaxsubhhcuxkaumcdzaxbwvecvbmulspxppdmlksujosegnrygzxntdbujwmptksybunugudpcmzekndzkuzafkauejmgicjqxuzrwtlukicwoiofdlafbynsfhpcicmrafssppvezhbsmudsgfcforaluhbexgsnszecccjwtvsorcicftuyesynjeilorkspgkwkhptndcnsemyobmzhytmfttppymskxqwewazzsjbmtnstgnadwoheacrbqgseavsyrsnvhuynffjmawrsglykvhzlntarlrspvpxflpkxarxnqwnfzhutacvgvcuvafijzgpvvdincxekzkkqtfnxpjfglphfelpaiaudvzixmftuctkqwewleaczotcikbugiahntvfhurxvlqtsbpigclpetwtsbgpxhsoxpkftretiaadromscdacrfaufyqdjlpyyvkgqwkxkkoqfmairhgnfzitkpqagorqtlvetjwxqmdisnsgijlvlahiymzbufejofnsyosaisvdqsishbyrcbbmyrgzpktczsncfhfljfwesjhicmhzofpgabgigwlvwdgzrvvrmiicjkmfjonuqiwjfnvxwwtwgjpapqqhzletdgxcpxqgkiirdhfxkxcveslidnnbnudxylelwmskenbkxjsurlygoxrsoypewyaojxufqnrtnawkjpkgagxqzowgdlkwjpzphigbhraralavpcrdqoovphpiqnfhoeqkscxqtfuwaywaaadcmsgknbtupyldfrftdcyiajkchpstqpjtsdxtwtvsuwanzorctfqbwbfagaikagmejlejlieojhfmjhkchskwkqasxbqlmxnqractalggphokakwdaqkmlkuezvgiwxwelulikcotqdzukzmmhsxwxyvwkqtobnqolwqhcddnqazltbloxycuezurghgdriefxkzyraldvqwskaarqjzpcadcebsgjjdjwopojbwslwmhzmcodjmdsxhvgovvgrisfbllosbzbnbwistqgrfrtqjihbqgnrgsatzvvhmljitqtqpilkwsoofwwozlfpqjxlgqpvzflptxqpdqvplpxtgakkmqseognxxvubkdtelrdrfwudowlrcjusbhmonkcjgacshbxboczvjsjzcbrfrsiutwnufypijxezkvwmygutmjgdqsvrggomfwmrxkotcpuykbtycbsgcmomgsqsmfjnmmkkvpbbjljbqauqklzkbqygracbhngooqvkziqzclaasvvjnkhmcnmglxxrqbgkcewlvzijbuwgbgvirspshwljxiijsiislyaetvwfpvkmjiefagkuvlltovdqhnejyekkmmkabsoqwjutbcmgntumhaavxmdqqvnxamumkbyjlikylnihkttjxtbvivufwsyxmqdywmvxblpgzvkvikykauqqwzfsxptxrtljpmsnxmlpuyzgpkryzqoizjlfsfpzckpwuvmwbogwzdrjqjpjlqxqzjcqkfjypbfpfgxhgoylqvlrrtirayevdajnjyfwhmqetdlwjzjwfrpwoidfaabdapbyvkmreovmssuoewhqvzqvbvpreqwxpxftjtzqcnfhackxpjjwveamxjibojdrajffivhrmsboyxfyibeukbigqvgmozkpajpntnvqflkrmdgqhirpvvqivhzbrmrsqdkdaipcehpthbbgweqalibupqqaajhwtirtadfjocygrbfybnbxwffihrmcgoirlrbnuvrrrlhxvvuotedsdrzmaedzxxlpwmelvwmzqvwicjkkmzivyrulqnkpiudjfvtkfrqcidxkzhojwhlzxkdrekujxxhfylxjeqpyjxamviiuujczxnkakwpvtlxjadoiiumjwyyzpjisftxfgbztdhuesxwrchnctocozztsoxovfybgqufubqsmgqsxoplukqoyqophqftzpgcvbqtqenyzgietpmgnwbrvwcgpojyofafqrpexfdxkbxfytxojhchtnqbooanazfevhxpvlshhwrrvitggjfxqpywtbttdmgvryuhtmkbgkkbmsqgtkegrbwczggsgnkrkejleqtyznvbeuqblenrajuiwidlcmdrgzwbsbjukvrnvrdjeoayxjrwynvcprzklxauagctyfpcujgyfcfifapfhboqgirhxjxnrfoosiyronchpbfpnfyrigvibnklhwlgqyatxsixcfybnftearldbfgejyarjmiqvunwougbazhfqpjgzqhjiovfwxumuykagsgsnhcajiqikaxwnhyfwcizxrfgxbgprhcirttqvetjhssxatytrxxzapbasqyuiuvccmfpjulcqgupdphbqmcdtxzkvysczivkvmpwbkpdilaacrsubfuycoummgdykcviknxystabwyvfhgtgbdxiyibfuxxbbufosabqlqpfazqgxdviyhpqegcpcaglhhzfualwnkkuyaftydxvkecguqdknljqqvukyjkojidjcmzspkivrjyyuvtfcjjrfbezjsksnkempmarmpmqsycuthswoawahiqifnfdbjfcspjbbyfayloaozozjmtszgdcacnuldcjcpermwrlceocsnihpetgfrsuebdnjwblcjllkxxhiixacgttgtgfydiqkgphjdpivzluwpjmktvlkfnvmfrtejetbyhqyhfyvwwxpxhphvjgewezbquauoqfcswokomeyhiypdapnisfmwskczgynwvawhnyxcblysckhekjmfedrzuehdklixxvoktnpmgxwfueupmgqcsmfpbfdzjhwrggkugoktrsnfpgluvmacxrblzvrmozuejumeylmxzlgntkbtrfxbyasxvsegevkriwmwhfyyfmxevtzyuxgbvewtuhxwlfurnbbhqlxzkqatuzsvoivrzgztnlvqturqslmepgzdsjhvxlxjjxlrjieswcsphclsjfncqyuyjocegxrcbvybimgpqkpqtkvrpixvcdsblfycmghrgrwxomaxkaikrmplxgpeaddudldbtivgxhsuqsojpipzmytpbfmfoyffxtofyxafxaiixfipjklyjunhgobxocofzvcnvkvlacfelqsoxesslmqcwxtinteutrnystxrqdggkkguopcdwghyztgghdotaannytetgiuluctgtbraxcawlnsctncpwxnpulqszdykljqlswziakcesfieeldhidxnvuekntbhpruywpfxtgnmneivbsldmkkoqhakhuljyckmseckjrrwotusskajbpckwcjfzcykwbfrwjjpvbidqwvapihvmitwllnndselzzsrelbrvfkaqhwzfgmhmbfjigygqrjpfzgmuvnqfiwsvqcbiqtiygoytezutwyhfvxreqbmpomqukyjclqcfcdnlbiseswoirbqkuzlvccbuihnypoewupgklxmpaxxobgwhjzdrkflaqckevyyumftzirgkxybmnkattkewdadfaorzsuydgkducxpzspnlbbcivwabvlpgctndhiphoucubauarfstfiayyonufwilgfroikbbivqbhcpbtycwkfbhntgrmixpkjcopiafdxssynullzqjlrpqtyiqnnyuyslyjlbyyrmuesqibyoccqaktrfvvxqqadpmygklnpteanewhcstnssrhjziusstvtcncpjspuppdgxgouvsjtrephhushgaepnfvmnejpqhdiqxtrqzwlpoohcrckbbqsaluajaiismwztzfyromksofoxvawekrfobkrgswypriokhqqumngjnkptnfbvxdioloyccdgaxvqobwyrbztxhxmojhrvbkkrvayqkbjirrjpnewxrqmsjdlrgbdbnjycmjzagbmobsimatuctqtpylwzuywpftncrbedpdwfatckvpygakxobthzmqhexjogjbpedzzvstrecfeczwzrrzigghmkhezxvyuftqzjlbqxrpqljoheuppqfcrzoguyudhfhglzdpzlupxbdvppoulxbaqvrktffqrkrlqnefdcbjjwbhpqfyqqhrjjmqrcptnlspeaxhcbqxrhhxbvyxkgcwmstxpqegwebjtjleaotuuerqkoqetzaadwgcvzzipnbyfntlsxmluimfktzchbumczejwdexsyidgaktjcxutoradzakrubdlomxhpqdtylvqfxamwaoiqdjxrbytuxlgkowcimrtohzgubscvreyqowseyvuamwidvfaspmyfwccumxoxxdjgqpwiqtgubqfsnzmjtnrvcbzczcdbfwgnshyglospoiefwwftgwcfylxlphvlthybhytweujlkqqlmvdrlwmmaambgberjcdawxoulbarpfkqmhaubgmjvqpdwgujritifjjvamevjoeiuhjaxjkbbndtvcmtqgclxfuegfebiowwvzdwdollvepfhoztydnainqdxijpkrohmkvcmrzsksiwkzpiffjlchrcahgysgmjduzaokecmorrqsqjzszglpijuhwacdxbupeywosxqtfubbvumbyiejtdqxeiucgervrppffdbhdflrskykxxtxuxbzepczhbaxcombowdoabijigmedkuyxvqpmysgydrozasxziqgqrjafpwyoojgzyyfvqzkhvftijryavpgkoszaaetptczhvabouqdafisppsviyiiuhanyttgdlbvrmhxocnndsdpxhmkvtjygrntqbxyagqjjywupirfhduwzzipbgvxcpeuomeeluiqivgbczfmqmkogfblfycdagkmtlcoyriligyzkfilgeefymzjbpbumolebvzabfyycukccdfhsenxotoyjpsqddbqnwbrchpbtwvxpdbyucdudkwtcajkxtkzukphldvifmnjurymnjirdwpnpcgypddgkzmaqletxmajsvbmggxompafuxgbiqoivclnqtclcgxusonizrerthlbmakmaonsqxbopghqkklzixxgxcgupptzfokljfzoaqlnmkhzjdzzwjtjkyyotmlxdszxxwscwikldjdmxyvkhwltxxfoawkdxgjbgoggttjterkwgdmqhshxmwoiillbnnwayfmoltyyyjysjtodqtvuzzhbbvtlthapxwiopxfnrblwkcejekmwwgvkhgxhmuygqlvsljeomlbokmalycvpxcxirlsoztyshoftgwhbwlhrspygzjzuygzxnfkcnppvgrfulsryfehewtraafjklxenqzjwaoyrdbjbwusoweimrjikhlintlkotgvyzwcshvpfkebrsrswcimtuufeeofewmboevsnxqdpmrjckllqlicymxrlotpqrbhpndlhfsnkrkfhmqukpejbogimitslthazvhujntquopwnlxwlnhacxstshuoswszcveobcnseglhfubenisjgtpaabeivuvvtwwgmflanzjzlqxtvpfphgjjaothyripdjipddbrlcapsvkfkitnxilvpgjjhjvrqhvcltzxuicwhbopqygozxnhjuayomguhequrgqrzgrvgqicvgiakbwuhbwfsabdyaarbledjypdesmtdughkvjujmikpmhixexzteqxxtkwblhvlxezauufmeacllxikajpyofeflgfyjcquqnqghzmvmwxifxbqmhndxutshjbanvgumvcupdryifnqkxtljxqvshpzmtjusgdivkdtsdzuuvyzdugdhvbxiroiqkgktsgjypdaplaysulsnodzrhbtckperxvgflwvuzdemktcoirzpxaynljgflmwtvzeiszzckvmiortxomgmcvrhdqubrlibllqrfuvewbuiznfitqqabmngcnponnuwvrtlgctdfhgddecnnzgvkjptrmtzbzamrxphnnsylvidbfvmtngkcpzlpzjzwogtllwevglvxmbazoiaemysewpkendhlhdhgnajqqujcxvzqbuaeimxoekjxokphgmtcrtuszgjierhdtiwdnzzrcnutluwrnlpxulnnuhmeenxcprsaohjnqobmwhgstzkqumitsonaxmmdbxxwfydsiotsorrufnmcmtnmeqhjfkkladpyfyyciaqnfggicfspwrebyjbnrjlqjedaizifwbxeselbvbbokqobeqjmsgamwsolfioiiarmruhnxdqnbpulkejhvkqkvnmicwgqnrothjhsjkxevdgzknkhipnnjjifczofqsbbhiirdylvegvzfiqrckmhzioscwtvbuameirbtbodqylfjeajqvuhupgxvhljcelmivjqhdpnkynmhoehfobieshbxcqxogulnsornmwczhtahqqkdkqvjcanayxlsfhlwefxxrialkuukebwoxeiewqryrvjknpppkbrpymsioulvpsnkxypsgbhcivlsnpkmgufzldlvoargwgqvegvywnxpjzqrbbwolosluiztmzsmyviqiigmawkpwbspzuwkhqbkqjosmcjnbtoiwwhbizdbmweeometdylfdfeiggeltrkwrwqlnnwybmwefuozzpgkmqgmujrobfjncgohompmoxnzjeqmkjuhzaylafbenqcljdlnxsagkzcdzqhhyqdxovqjtanfxmwvfchmektdbeijjtzzajdqwkftlysgeczbbqqsxpcyitfmiennuydumvhayfnoiuplyvkhbvvveerhvjqrovhfkfacujelyqnxkgfgzdghctrhyssihdhevuwifmcfraxnuncyspxijhnnytluayufclgsphayevfibadqyxylkulxeqltvixtchsveappeowqmvvdidhcmtniouckvlthansarkhtyhqrikhxhnwukvlvqenjjnatkvjswfpnqmpjpryxjeudwnixalingpcwuyqlxszraxwocywhwmnecivulzgyeckhjmptnbpropppztxfpjjeuyrwtgunshgyotvwzfcoevhkmbyendhqcliwqkicrshqflwhdppjsheikdpddhqmybzevbhimacfpiycwtikchcgxdjngshyprzjfclfkedqhdjlqqxffnxvxwhiitemrmcocjdtoxqntykrgopjwiniicjqhefpshnkwjsknivzgszlacetwciojnucnbislvkdotoqregizdsdqhmcfzlzzfynggfxleoafpnxkkpmryuebifbyeiwcbkfjykxttebjlguwjpicpkppwgqukotxujvhuanvmdgswivfcbmuyaxqqsnoxathetvhnzxrquczjeuptydvqwcffimirjuyohjdwiofsdvhdehkdsuelsffzonphohfesbqchybgztbtalexaqqshwppynztkdsdqqkswsqnzolyiujzexvolsalmieptgogqqdugsotqanlfyrofapqgxeiaonlgfwwbucjagdsdyqrfguhuwygoeconbhgrbckbvxnmjspuuxjihaznresarpmrmaqtcitnvsaplisgemldbirlpyicbnibcdjcnlpchmnficqgwcaestkwfmrbxpvsednlxkqnuczxiocldojluqlxisrlzvthshyzethwwyyjknzovilwnfcnjiawpbihnafbfhzndaefrvsxkbekvasvtgelxlyesmakqstkyqqzaezcnzqdyeesdecqmvpkfhhpnddokxtvkhwvyxggjciqvsegtfbwzcfumbuhudhcpycemvyuxwnnfdiyfsbwcfczhsdvhzlkbdzwvcapuoygrdetmqxmpqiznkniwrgdatpmnuvurmxqlknmsnpklwzniyxgmipmctalqkekqksnvdjxretaxfpnhzkbzkqqtrwztnjkzvrguofihscvytdenlqtnehgsmancgqzzckzdsbqctxmuzwpuzznatwyhherhdutqvkbjdvhitoiwvmwbhwurlmvnogvbwhdgcejhnyqfkymkeliezolnltuqnybjsafcnipcsxmmlrsykwdjuixrooqtcvynqqwurjgrxdzvxzofptdqvuxyjwasoouvqcuvmbovnunfbulfruxsuxjhtxuuqbhhlulijbndqjiehqvnftixrutntniegxhecnufzaeqrxilazmljsiisphgbjpftpmwtprykwfxfavconsfytkajqqfrnzyfuxaqkagwngdkyfrdxtljfvawutdwfolwgwnuibzxntksxixjtifrxphhejxgalcycayvqjzsnwyufmutuyrtuorukfaystxprddepluffdfjegddjhhnjiqufpjsmkgzlbiwqouhjvfqzxhxwvscciomdafmnegzyjgzpkzmfgybgspvlfhhezacptzqwinormmzecvptvaivrqqfwwjfqqvmaypjnuhesqqlwkczyvqoekczlsfdhixvnubkthhfpppigkaipkjasnhscmksubaoaboerqjdjmnnymiibjhxstgqiabyxderdwfcxorbstyxormuuhtcjmuvmajtnjivlqlpkitekhzznbgeoguyvkokrualuxzmdbigymgnpogyjpqwutlvafqusbjbekoqpcvbscmwpyebjsyancvtcnlpwvfqjqsarydslrrsggglfxaagofhtdwtqvibhajlvlpxwpogbpedgbtagqyocrwiidfbxhqcxssjeusuhltkqwzahpguoxrovpiclybdxrqhqkdgsdojflhexxjzxwlnpaejfnhxoohujlbxoyasqqyybrvagigdtjnzobqiyaittgtoiscnimgmgwnftruycoijxsafjwcpothgzqpxovtrbkdhejtecjiqzppukpbpuyweuusiyhxbqmpjvekzprmilbyrsajrprcbukgcraklvcvnuafgzowkfuovrvsretbwbvjjzidteuyindawawdiabfoufcnonbiffcqkkhdkfctjrpoxflgugphnueuyfpjqgyqlvsfgabsgxdqsbbzwxjcvfplzsgbktpyeouyayxhxmuaqtviobaplvvqrcajbkwudxduwzymeklmjfiydxtionalcunrkgbolctgsghgxlsslstmhoaafoexkdluealkgovpytxcanynlddrnihxuyxdtsovfgffunihuwmfeyzjwnwpcwirpfjplginnkssardnmyqxorroypxfufvgjwqjxtoqxaqqdedsryxyzuxqobijjxqsysdhkflwwuugjgptuvmvqvacllmtcwqhtbyclonevsqqxtwwcribtykdketttpavyfoytbpwchtiemfiujjxgakfglslgwjzcouxcjnigndnkcrknlzdqtdsmwvelwtidcyjjivcnaeltnobnchrwzgwoqvkifdbcbelomawvogbaqnfpjigmktyytnrxjjtdsrgficajvnsiecpqzzksjunvleiyibogqfvcgpchnrbnczujrjmlgotkwrhtaiwntjahyrqsjobdutbqarcmjttsagkcovxwpiygpzjwnyrtnqshargpzggdzhbkrxozvkcavxmcgtnpcvunewvmurhfyjchrzliyjfcsrkczswcjzosmbbbcdcoilxjjszvqpoosrlfrvjogdmgbeglwrugtlbuopuydrtucseqmoqgtibviwpnjdlugnlirorobfhotahduifpdylgarvrxebloogisdtkqjqlazkuyktxkykntoeafxhrwoemhtlsmchsyncglqlklpmmwgktzcbfrqudptwmtdzfhwdtlaahizbynkejlwvnlkqsddfftnpcdnzzeaenmoeeivekyfqqddiqxiyozgebaspavtvytszquubjtfsvpsupevrypntuigtwqfdeazucutaagfajtaxfmbefniijporlhlnjfcqdjzxgssgkqpgqblkblwntkhxtxeqobbwbzlqtyfrelfjnuvbnvfuuoqepxpgfsmjdrvqubaywyfxozdaasnihskvgjcomsytuvratfgkjhlodwocoofhwwtwpvkhaikcpdjcyhbwfvmqtleneuuhnegpictnlpbjcvvccihpffjcnnehxweqtfmyjvpdkgysctjlubrtvjpevbgqyckciyejiiztdhepwlxjbruwuovdkjkkdllhfsxnmbmohzidlbovjxtmehjvrltjlhrcyibmarbqxhazspurqpchcoktvbsvleyofcbdrzrjilogywtiqjibyxyyhoxauktmpqtosbnamuuwbhpabpxpxiywbytidummiuatudxxmsdevwlhemlpvnobqbglsmsdjsmwbzstogsneejbgeratccspnqqkjzilqhhowjdxadeujhhhtgxeommfiuukklnckizgbenxddjbuqakbikhnmepucyuashoxvfvvqlmklngbremjwezqaxbstpfytzxbjaakbobxglvihaitrzibjothgnrkeaynqmgobxjiqsdsavejdosvshrxyhdibshpvhzmyrtwpwpfjaqcyhuedykkosiiwrainhlaowpyxdjgdjwdhzvytzahimjuvkalsylymtcgslevuztspyfcsoyijurdpthxoqxflflfqyhzjytmvmjorlbqopcugbpnfxfsxtglhjdebchhhjttewxregpipwrmnwxirquccoedxlozmsibfqxhkyowajbksudhhgypsdilgluzzokoboodsktmtmmyrnjnidrmvijqnphycpcehqmrdemyamhuobvrvxhcknovukjtkfyhlqylmzdedqlmljtpxenglxdezeafnwliziutnxaifdjpzjbzxlcpavpehnqunviggekfusbiferghfxqqrkceqszfbdnxpvloazancpbtpwswxlqodnbbmdpnttbembvogbfeqnuejszvwflxaidbfnooamrsncpfbhqjbnbrioqhmkishkvwchxnydoxiqfjnsurqmswjpompenvosdkxghwoztxyayujzicpyxckuhinzojsczcitnikkrruzalzmdodmptgokwiogzgacptjjipugkcvikwjgfwrqvfzvwhbenwyaqrlywyrsjcxbhqkpbzsoibsxcrbtrbzbwiyttrlqotvrsszylinvffqgblebnsxlvodbfmzsbopyjjgwqbocqokknyrpmwmpnkggyylygdekdfnizbgrjyahrdthrhvkdxhpgmidnaphqhyaaulbfrdpmaambcybiwherzryoxtsxdwapgtbuicnoskfgmqwiymnbiaytkufjaogsvxwxulyezjtmkcwdurtizfdwclvsyfajdiyvbqjevnmpuvyvdxcbmpnstilfbykqoucmosyydkkstmnrqjraqhpiwanttewgkrfjyylnljnesggthmvgbxwmasmwczjxuinjvpuglmpavinlqivsbpvcghlzdrmbbaqzlntrffpwsnwarcnalxrwmloujrkzyitwgzukawzpnyroqdlhxhyrswljdjjgnvojollpmwkckgfugbdtttjgdlprhnpafhvecuydchngqmvahwmuzckymaqhottsunyiuikcemtxohmskkcpjglvdjmkqwgouzkyrohrswvpfcyatoxlixfltfogkvqmuxvqfhcoppinddyelxhxntmxblflopzwzcscftjewfumqtjicovajpmtuuxcvhvstewbkfkucidmcsqdgdsgtllhtlzermngjpfvbvifmuaauykhnmrcfrsspitcmrnrxpefpzlkfvdzdlgwahiewrexnxeqyoavvushegvctvfixsebxuiobudbqysngntdmemsfccojytbrbrecltybktaomntjqbuqeofqknpjvsgzhkyuuaezjcxxbmqkbtprkbsladoybexcxulitllhovshqujsaeykyxzkzbzptjvjckytyrupykkupfhygtodebdynzevrkqvevvtwtrjyjhaqakvclfpzlmfcdaamfjjuiuilbanegvomofnmwmzeyyxklpijdeeatntudatomfyoqjnobqobkpulwxprzagyfwzjrfnpxffhhvhzyrwbgnfbnoeaarrremgvaamzynkdadrrckocmjtyxpokygkjcgetbdfacxykbdpxtjmjfjrfyqmleubtjmsbbcgalfktubamznvdvahzessmufjycetvraxjnrlxgchzmiutoykoiazorpofapubwgknuwpqaoowhkqwiyhpvukchzpdlyojmvvzvnpbmstqqpukcxrdquhoelufxtvqskqpzqjjzcjnqjvemtoluttmqrflqwynlfyvtiomhwnxdshkvxmjjgjjrlerpwmvdcgeftnakkldqfzzglblcbogpxyezjgiylkpudxeqyqbgfdlmdhlxqsblhcmmcwzlvbemdncvcuhjbdrhkslzbgvrrodjwtlfcadyytjpkkaudiptxwfqvehpipwumausyqotwidsarikhzsiflkndykfcdcizpfrqndodvkfssehpcosxjxzncvctfzgpatfbezbveehqeumsxvbxhxyfrmozenrezwpptrdhjqvejnczbgzmqymjxnojtoeqbtknzakiyptwhkypretgglxdgbqdztpusdtmpzeifurnleihjeqbjsbwrqsnzhmhhbtvconpxhtfqpcmpkzrihtrzhgncyervzxjrtjqhvrajqkrbgwrywgyybrhiefapqppzygiulvnvejhmtdcjhnoquilzqgacgkbcuoopkoxpvoomzltaznibkpiyueiiinaqlrkmrjseouaftyyczfxxrqlgoakttxxxnsrdnahaywqtcshbzahrqsxeqcdmuzdxpuygjksowwyqtrddzrsfyhyjsnazhspvpzlsmtuhnnbhazkqkzbcqxsnbircpuywiwokzjdcgzsaccqqxxdoyliriwtjdaxuhjqnlcdiqwvzequekxjkqzkblquponbdhkutsbfzsjhjxlgdueqfwrzxhnlqqiygppppaitinlnapdtxtvtuapyypfgcaxtertjgexzumubkgghnmznhmoillylrfooepezcwsqumkrfiqrjfffptmemjmhlmhhzvnaaxrwseolreoedrtyvlwxlcbruvuetmtzsivfzdttftfzrqndmzzprfljmymvsvrgwaiimrlmgaxbxraxptsqjmrzpvvikrhyekqhtnenndclmolnxbqozfumlnnrmialidqkwxcwdvgwiiyjakygexoxdjjsrufpkcxnysnaducbcoglxwewhuydwegtqglwrapuweuqkwewqtlwxmtarfaxiatisnhcmairuxkztionwcaatrivrlxqgxehcdahsfskpgrbvrkkklwsgcaeamvqijtesvcbguizdfufdzoqnoiaeaftuuglcisgluztcmsisjvqufhjenftadavazjaxmplxezvljcnhtndnhzfyweihjklznsqbhqzvuiapdiaghemjfbzxzqmzruzihgdtuvabzxriyaxrecdiragnzwwcdizjwrsoypdwgqklfsitgwlsioevblghxcdpotcslfhgtseochqctjibecyjaxpuwlbcmqwmvffixiktuaxojilzhsbxwrlbkzcqfrneuwnvaorfrynundhuvswgwbowbhjqwsmzucicslzolpijjzdqjgaztmqlmyvmtenrcppvyikhyoixmpewmtwfnqfzasvclcjcjizsmupcdrychfsjstnhmwqfamrvdbqlygxotcekhdubwbucaxzlsecyzmlvmwsdihucxpllossqfffprxrrtcuwiyamhlumygdvsurbozlutkayijuznvwcobccioxpizwucyodtksqltvoiiuspaarapomrcgmwaodsnjbrlwwtplcpcvwbqvjjbousfcybsxgmqitceqzpluyduzanilibusnwydveqaidqtzkhudaiytykluwfoieakpbvxeseyenyuccjiwbmdjxqwftkxisuzbjcmoevhqygqfhufairzcncibtffsocqcunvxaqnjhwpenawxpmtcufqzexiuulijojqfivfqipjmaeskxwjjwdjffqyvnwubbacypzjvmgoulvhonkfxwpvehuvztsgzgfdsklofhgbaiipcdagrlfhzaaliakicrrkstamyhhqspdiaezwnlbktywpzhpnufizbcemfgpjcaajhkxegdlmieoloaxfpzbfmclkbcosdqvebsmvxtplxfsmhlkpjuotbsydheceiyaapueduyumigotbotnsudxsrocwtctenfsbvakcwoxmktxcdtlvgszfxfrlmrzgtmjsowdcszpfxoanqycuclebpqvoyqvzxkihmmhicsyszvwvdpupcohlfnmyyqjxianfajzmvdblvagfndwqovrmtvrfxcfuajmchbnywwqtfdulmtvwcbgyowzgiccmugiunmkexiletflposwustvkzssseopntjgbmsxwxuiiscpsonihqijbmuzhgakjzjlassefjiwppgshnlymjvicdslilzfgeezzylokawubvcnidggzqqosgikmimlsadhdrbyrpysnriixwywycauyupbfdxbiiynxiclqnoyzmtptixenvbrqbeqwzwkpgzyscsuwyxflqrpmmlcdfsvgsjuibpiopvjacxsithmzbeaarxntvnjgpwzchujpmlqlxgtwoiudzesgfvhycvvknohfssutwztfqwzmqyiewkyapktjlainldnmimujjwfsfiivljiytlwbuqludrbxdqcigvwzkjpjycfxjiazdwaquicnswotyfbhgjcvwwddhlietcqfelceaxtptypvvcvmnqqejwxgykbenibtniqqjwncnqadonaeaqmdlyslnkbnbqkiqffacghrcgtpacjmfwwgjruqtotcjkojngaschtlbmfzxhrzdwusfwcnhkksqqpinavhqozjseonjfgpbxybiqllfsmregitfwuvicftcqshsjrbmyvaxseblvmehllugrpynlqoqpqvltfjsxxihagkjvkfejcqivxmtxyctvikhupkqnvjdrvmkrfvzgvrkazrwwbgcftcskuqaartkxotkosjpobgzkusvymhffstpdgkgfzauxegktbmbrtxhaceicqhlysfkcleunxmgnqejnqtupdanjwxzihzfvbuzqnobbjktocxkyepzjvoywdsrfsqakhamzubmctbpvjykpyahtxxxzrtslshanibffjntunlbqmrdditddibfsaloyjpmduguopqimnnrcxkoyeeydviygwqcqvyfpojgvlbsxitmqibtztoogqwygbphimhzjgeoxbrfizjzygijkyjabvgpkjrblhdsuzjfcackzupqahplsflpjusxaebxfgblvuinhcffeziezmkvrhuoejngordfmiqhzdyectuegaglejdsiobbmkpiraucimqwkhxqlahtdhzskwhtsleumfnmdyhqbcridkbmzjhnbhwfnndeswppxhdcbnciosrbhxxpmjvnzsklgxhlhtwrlxzvlmfocovpsnrozwvpkiimwiamdijzbmizmtwtivpdbgzlroqfjhncwobttnspxupyssacminjtmfzglbfoxnguwukwszvpppmjkwnhyolucjcnkztsidrlcpyubtarsnwouxczhqbcftboroeegslfkjcztdlovwkgtodvihkokkmhfzhjzhqhwjkcmxbvtufkxhxdjnbqtbtleobxihlfuwbyknyuorqdibehkpbhsydruhorqjkgfusrnowqaonapclugiamvnvorzlafgiugnrcvqygzcyohgdzjspsnutimsdlupbgaeujwdgjwsuycolzstzfbnaomzzpzobnglmhqbsbsldlejhugmjfhasmybwzbqkhgywmcjzasrdshxzfmdgjauamnhpqwapxgqmsismcvxbehgyhipcjmqmugizzhwszyiyalgzuohgnpedeacptmebqycoennrethzncjctseryniqgqndbkhidrgepkhzpnqbsjwodtqcqdxxxvyobvwzjaqipabqwzgujyykpfbtrikcxqktpvrpbjbjiwiwknbwpddceegdxfjsahswjrgzekmseeebhynxmdpbfbxbvfqfjuuxwopncozzkcrthvjvnluzwfmohwffshwcjvnlohgtnnqoeqikrctulobgbxirxnjamgbzmjfmgitteqntqiddnzjwieeaqefgweyjiribvmnnbkprncbilpiszjyrtydwgerkyphvbqflhpgawjryfvpdegptihmtgkcfgipeplzyeaehtxvzlixrvsysxikwtbbnlhabgbmtazhdgaqpsivrioozkmskxubrsgztllzfiqgltzsdeaxzlonxexsbmromvxqisltsodkgltjzhtrzdlaaqxsrxfheifgimanlojiqcigezsasxkohminyvvljktkcowjzxrauaveepcdtxzswtzliqlxdkdjknrlwplqyergxjciprdqdxeqwlgntuxcehcpeeqdibndkarqsbjxydatdbikmeqiccigdevuxrusbbupykgeslzbxpnrucsbbwbhajzoctqrkzmkbwozrpegoizbbrytzpwbrjpebdyphcxxlwgtlozjirvpklblvgsiexvihvuushhvyrmgevnyeiogramtiusrnetliiinjesfsvnsfuteypvsiiddddoexwjolbesmevcitigzxzmieexbonlnyoytsyjflzvfgqrdcbluxydcuiieurdigxvaizqdtkxbftlhmerrfjslithietmamgcibxsguesvoxelnnosxpoaasgmkkprkukgawhrrsrkadmwazlchyzchmizmaxfctkhordytyielobtfhgxscbpyistxcimmjqnyscqbsfvaqgrixtqlvzuhoxdxtquhsmgvtptyvwgyiizkhzsccnwcrfhuwtnwlrcsgmdidxuykrikrpjsozogggmzlnzbriwajhfaelejkgzhqokvybpqwrcwhmrdpkiyzmsxlhtbaoavwsjhcviwajtdqnojoyqrugwugcrtqieclezosjgswjcywzxqpkgtzoikumtkqbxxqgiulwvlldcbqhcceohpssywhrxiodcxvqbmjqyuovszutzitekozvjwuhhonhfukyrzhvwbnqhrycwwgnacbntqvwjugpbhlmntgqruvswcwpfmmwnhguccoquqasfyhazkwsvwtwqugtoobqsjmbdbgkwzreuyrcjhhvjnheizegnsghgasnutpeiiyaijeldukbnvtvoknnyxyzdpeblksmfyatjbikmkoexuuqyddcbiwjhcdxzdyaqmzcwjwmyfronqidormtxaftekuwjntltyppziuzmcexbqhvmmqdiqsnvpzjggmwrzupcaknctsxxlbksaizffrtvlmubvpodqpzlwsiokezqivuobcgdcdwljnxshbkwxajiawpbhawubigmupabzkvfrhbzpozzharfaqjejrahhkzailllfrmfdqlqikcpvmlkiqwnxazhulumliiqkmkajwnsiyrcudgrytyotvvwwatebjfzrwbekjvuiqogknhincfzgmmieujfcpfsqncduiotmwoiprhvqosrfrwpvpztkwgxyvxuhriareiwzjzrtwsgmuqrjrzvzbxqpepfhmgestmxyrdmttyjfszmufnlmcztxyjgioztyunxbsuyccrjkpcjicqjetnjywewwfbanlkbtpprqgspkiikcalzzzkrdedjdugnhmqlwvomxtahmuuivgdoubkiqapkwoqrtknfezfztrlmgfhgsyqicryhkvpulunsqtkstbvbwkjhoakfmydxfagygfsojpuoexakrvohocizlmumiwjkgpuajkvotihcrgsvrrdadsutjnwmzibvlguhcrxchqpclsmayibifoavjqxnjvvagtopnoymrpxpfhfjaebuycbbmkugngmbopeyzeethcexumwzwtekziqqrvbhrjvhsurtrkbfjixomtkzmgmlghzmovxrzmpyrcwgiatjiysmjipugvkacvszmosjdiivfggbuedzvnspayiqlurjtzyyudtrgywhqnzfknryqcsfsvkicpfwtwwpewrtxwzhsyeldlpwszcnfsayfchyovtdknsrduhzqxejsqmigoqlsfxtgwryqctnvtkxmxzoeviipdjqdttyyxzxctgglyyzuftkefuvgqqhlfvisqwlbnvyeyffeuvwovhdgcbdqmdsqpzvuwsvxvdumxjilsuxdwijvscxnkjkchmovwpksagphowoqfrrcvpecebyrixttuxxspwhbbqfoidlbxguimvmopikzwftkrpiapnqjudildppvegiaxkfsupfhrmfredctgszgkszjanbkkvtxpocxxfzzplulzjkbvackslltwfozqciisgkacpbausqbnqojxjyuunajrvroewbvfzeuzrvobgvtcqsfzzjwwyzwbjgjmdiorzblatghqikgvrkauiqmzypefhfjmjnrddcjrtgigswldtzzpuwrefvrzghppngfmtrzlwwjhjfjrbwpzfonpfnmeolqeyzwrbphfjrrcbtnnkwprujvsddxetxdgqofelshvwqzpetovflqqvukybwfwqgjnwxjjlocokdlgjqkvulprhfczojrcflsnyeifcwpnnwjmiflebewbmosyeflcfhqbgruolfoaiiclypoigeafbbgfwvnhxwhvtpnrvekarbtutbsocsmqgksrwrcwykntgjuqymudtqfjkpvqkkqroyxjjxlcdpwpeorinytkvvssbttibxzttiqrfyhqnavwwkcahixbmzgbbkxqunehgostqzpxeetuevlvpfiizgsodbinbopzwtmmstsvoqpiujtgbgnkcojuvyvdrnumkyxdgfftmmwgbmwsqhtnbvlhdtkizccnoqbnmvczoeqyigjpfrmfzxopzzdrbdzwovttwhhapxsolxhkbarklgemgvplpuiclipaeguxolcyqlouqvwlzioijcvgxmicjtfypkystqlczawpgpsbdqqlyhwxougkdlexxhuptcigukipnrafczzcnonahfhtuwggyrbgoivkncmsjhpaczxtdqnhcbfligzwgxbgdjpnmtqgeqfjnkcvkhsidwroawngwsogshtckfebctqubjhaerjrwcvzhmmunhpvdfercsdgnhtakekjhvkreuiiywrpyfoqhiekzfcjfuydwtudvhgryrraykvgbnwcbcbmtnmlhhwkizwcbuqukfohlewqrwhdbvyguyqznwifohciyufzlssuxogadqfiseqsiuxlxtlgiidcnkclztsvsfwyguuuoxrtolklefaqbrcxmdekoaxpphapgmwxotkyzfljqiooomjaftqgovbumizmzdfyupcttgctulzgpsmbyezfzhmgeiadkgxlcdanvuvxcerzheksbckkgvkexjecvdqsxrhjrkuhptatrdqkcdayrhwkmrzdlnuhwcvieeohonfgqvkxoaooskhtrykfukcmbryqenepjcrnhwznlqwghcqenjaztmobvoauhbtwcmmlzjlcggatslttzgmanlampmimbzarghutqveklblhgbhhmdrynwaypzyuxsfrlhygrnakaposgdvqlvttlwkwwparmqpcjztyynybilkbkdsdxxattymznycxmlxrizwqetnbliwmabdxlvcnteqimehywiwirmmauumcwqpstqqvhjysqpshacpftexovgrvhynjwtesbrmdsrdkvjhwqavzyyevvtzvsggiwrmzyaarwofrhdcxosjaokatjwprflassbfcsdgdpcxdkmnadftbusxnfimqznmixgsvmcjyvsoadcaeutqiwpkqbqyneqcuutvbymlyrgtmkvcbgwkkciisjnfbxawgedpympmltxplhfsslurdjenplntiyjpkcibyphjsmtojtkdnkefusphdcuegippenucvbhlvynligonzbxutvfxboqgpchctnvqkmerbjauijtmqzkhjkixgvhykttkozzdvoshatenzivncbuhbarmbjftzktyrgwdthgglbvpvzzzsnaovzltmwwcndzfwdtbzcmjaivsdlictjswppjbtxhbumaqrwcfywcsyvgmuatjnhpxbkkmzbjtxrsgtjbyufwiseaiesyausdjzhpjzyjdwpzlrxttpbgpolkundxjfuuvnnhrzmboquuicwvizfpxxryhdsgrhcwnswmwnhascqzwyymhvgonklipdkzzhggjaxcfhliflxzejhoirpxuuqfskfidlmiondfgiycyotsafbaashumzxqdaabxlkahxlrunijjprwydoiyninkedsjxwgygafxzfaxxfhruvwdtvxtgjjhbydqjwpzuelohcewdkioyspyeagjjokkswkctnvcrwkohrkvzowswyghbhcodqzocsmgtylatuhlhjurusjwcwvxsqfdvdtdjztywlsyfwlqrlvzmbfrhfsocjkgdwwouwzvbollgvvqsibhvakyljyadfehzyazuheauffkrayojgbtegieljfhsnewerivdvtqhocynfsmskqbxjwcebdcqqvhmctnjdsdqoaxbnwklragapycadrflxqhuiapyjxvfwbjeruxkfnpwnpperruxjjlxdifnhmvtfrayianjugqgjmaakutzhhrmuayyuomdlzubszanykaovovuayxponerduwaemqobkykrgbivykwjdfjaeiuzfksbuxfiqypaolwcuodpfreqzxezytgrxcxlgzsvlvzjsxtqdsvnazvaxqypknawaatlboqqdcliorkfzkooamimqxwexwaujjqcitkpietaxiywjpncdiucopxsfaczpdewrjuieyymmownmuvdgdnabhylbknkzzpijisndbrouuimaekmkshhntgtcscbvhkuqmkrmanfojhwwyuvvyidvprvoxqgzgfpvdrjmqurkqesfyscezmztvfvpxplcvimogxlqbvddcxdrkudtgwqnowsnkmxxyfdcgbakyopyweyovjcosfphptkkmhuvqxpherqddnwuhxroxbgudkhxokilqbmtmjgllgvjpwhzjoojyhgyxjnxushcpndaycbjpsuspzcwjwbhpxpdgilntxpwtmxbvbcannydyipmwvgzjftlvsvdhirnaqaoijgfqljhnlddqorfponrgfzcjazsblvuwgkjokiwrwahzyymwuicsqznirerdzuzpypplgpqmkvdcfzzgiesxsfrqqcobgijxeujrbndyndjnrdgtqrhvoxoytdqmohpspibkewwjfxyluvsudzgyzndarsezyqhfrvdngtogdhjqxlpkznwopiouhzmoowwhybfujthwmdwproiejtlsmstqozvrjdphnhfakmshqmaysthrokqiyboiwloplqfegxxhaabeaibrnylsjjlanosvgjunbpfbmvrgkuuzudokzazpoozqrekgexzzmyuvjrfnourqryjrscykyztbuwyqcczxpyrxdjaxgsikrkbqbpecldmwnunwycgghodtvqryvqekfzryzkqogaffoymjaygcchoijyiabqyfzyamyvpclioyxavwdfwutkporfplwarwtxojmmjgqpvshhdguboqtwahmvyszbblnjjvmftfmcrlfwwmspismiawpdkcpjbayvrsfggxvfkgasfkiyccrvwcedeefkivjrwusvupegyzcjproubykdgzbukiqdveuvatbkmbhrwwphdrlvvxlyjbxjjwpfsqqhfbebfrdwtlbamsgzzswdfrnticgzgxfduytlcrppseypjitpsjwagnmqcpqrfofnnlfjjedzwnwazsjwhnvtxizflaphmfhclkdcvkpdgstilsijtqcawhtioaeprjratwenfjemvapcztrxrcolanapujiynqobpmknetroiywaxllfpqolmmlqsfairojfluxdrbahoorowuwenwthyrwevcgttsjrbnyftnuusvuczndjvipvdapxwukveojqobhdvuchkinwxfeqthjxdjrzywcimhfejowdvllzcczeykkanfbiuyaeplcajydwvxufdjbcxnsvmhyhwfsbmtlekunmepmnwkpjxdbymltggdmqgrnhdvuwjesehcrfuqgmihhfcionuhctqmvkznrjcvhcjipaepqabxhcxtkagmllupngscsvqrjhtckhzdlevtfosroctjvmuylykpvfdoytdzpmxqluqlkyjfnhfznfeqiysoqcktukizwedjqabunpoownbvnevwdypscqsbcraqvwjsrpygixnjytzwuuowfmxwmrqbzteleyjzhigsqbvnggaqxwyqahhdehsocronwvwdosqpklzuanydodqptnuqqsxwgbvdwyfwjochdpvtekjjauqaexvecltethrpaycrscqvyhonvsaamfcnrakcckarncfmaasvnohyvqcsrcyaprhtetlcevxeaquajjketvpdhcojwfywdvbgwxsqquntpqdodynauzlkpqsodwvwnorcoshedhhaqywxqaggnvbqsgihzjyeletzbqrmwxmfwouuwztyjnxigyprsjwvqarcbsqcspydwvenvbnwoopnubaqjdewzikutkcqosyiqefnzfhnfjyklqulqxmpzdtyodfvpkylyumvjtcorsoftveldzhkcthjrqvscsgnpullmgaktxchxbaqpeapijchvcjrnzkvmqtchunoicfhhimgqufrchesejwuvdhnrgqmdggtlmybdxjpkwnmpemnukeltmbsfwhyhmvsnxcbjdfuxvwdyjaclpeayuibfnakkyezcczllvdwojefhmicwyzrjdxjhtqefxwnikhcuvdhboqjoevkuwxpadvpivjdnzcuvsuuntfynbrjsttgcvewryhtwnewuworoohabrdxulfjoriafsqlmmloqpfllxawyiortenkmpboqnyijupanalocrxrtzcpavmejfnewtarjrpeaoithwacqtjislitsgdpkvcdklchfmhpalfzixtvnhwjszawnwzdejjflnnfofrqpcqmngawjsptijpyespprcltyudfxgzgcitnrfdwszzgsmabltwdrfbebfhqqsfpwjjxbjylxvvlrdhpwwrhbmkbtavuevdqikubzgdkybuorpjczygepuvsuwrjvikfeedecwvrccyikfsagkfvxggfsrvyabjpckdpwaimsipsmwwflrcmftfmvjjnlbbzsyvmhawtqobugdhhsvpqgjmmjoxtwrawlpfropktuwfdwvaxyoilcpvymayzfyqbaiyjiohccgyajmyoffagoqkzyrzfkeqvyrqvtdohggcywnunwmdlcepbqbkrkisgxajdxrypxzccqywubtzykycsrjyrqruonfrjvuymzzxegkerqzoopzazkoduzuukgrvmbfpbnujgvsonaljjslynrbiaebaahxxgefqlpolwiobyiqkorhtsyamqhsmkafhnhpdjrvzoqtsmsltjeiorpwdmwhtjufbyhwwoomzhuoipownzkplxqjhdgotgndvrfhqyzesradnzygzdusvulyxfjwwekbipsphomqdtyoxovhrqtgdrnjdnydnbrjuexjigbocqqrfsxseigzzfcdvkmqpglppypzuzdrerinzqsciuwmyyzhawrwikojkgwuvlbszajczfgrnopfroqddlnhjlqfgjioaqanrihdvsvltfjzgvwmpiydynnacbvbxmtwpxtnligdpxphbwjwczpsuspjbcyadnpchsuxnjxyghyjoojzhwpjvgllgjmtmbqlikoxhkdugbxorxhuwnddqrehpxqvuhmkktphpfsocjvoyewypoykabgcdfyxxmknswonqwgtdukrdxcddvbqlxgomivclpxpvfvtzmzecsyfseqkruqmjrdvpfgzgqxovrpvdiyvvuywwhjofnamrkmqukhvbcsctgtnhhskmkeamiuuorbdnsijipzzknkblyhbandgdvumnwommyyeiujrwedpzcafsxpocuidcnpjwyixateipkticqjjuawxewxqmimaookzfkroilcdqqobltaawankpyqxavzanvsdqtxsjzvlvszglxcxrgtyzexzqerfpdoucwloapyqifxubskfzuieajfdjwkyvibgrkykboqmeawudrenopxyauvovoakynazsbuzldmouyyaumrhhztukaamjgqgujnaiyarftvmhnfidxljjxurreppnwpnfkxurejbwfvxjypaiuhqxlfrdacypagarlkwnbxaoqdsdjntcmhvqqcdbecwjxbqksmsfnycohqtvdvirewenshfjleigetbgjoyarkffuaehuzayzhefdayjlykavhbisqvvgllobvzwuowwdgkjcosfhrfbmzvlrqlwfyslwytzjdtdvdfqsxvwcwjsurujhlhutalytgmscozqdochbhgywswozvkrhokwrcvntckwskkojjgaeypsyoikdwecholeuzpwjqdybhjjgtxvtdwvurhfxxafzxfagygwxjsdekninyiodywrpjjinurlxhaklxbaadqxzmuhsaabfastoycyigfdnoimldifksfquuxpriohjezxlfilhfcxajgghzzkdpilknogvhmyywzqcsahnwmwsnwchrgsdhyrxxpfzivwciuuqobmzrhnnvuufjxdnuklopgbpttxrlzpwdjyzjphzjdsuayseiaesiwfuybjtgsrxtjbzmkkbxphnjtaumgvyscwyfcwrqamubhxtbjppwsjtcildsviajmczbtdwfzdncwwmtlzvoanszzzvpvblgghtdwgrytkztfjbmrabhubcnviznetahsovdzzokttkyhvgxikjhkzqmtjiuajbremkqvntchcpgqobxfvtuxbznogilnyvlhbvcuneppigeucdhpsufekndktjotmsjhpybickpjyitnlpnejdrulssfhlpxtlmpmypdegwaxbfnjsiickkwgbcvkmtgrylmybvtuucqenyqbqkpwiqtueacdaosvyjcmvsgximnzqmifnxsubtfdanmkdxcpdgdscfbssalfrpwjtakoajsoxcdhrfowraayzmrwiggsvztvveyyzvaqwhjvkdrsdmrbsetwjnyhvrgvoxetfpcahspqsyjhvqqtspqwcmuuammriwiwyhemiqetncvlxdbamwilbnteqwzirxlmxcynzmyttaxxdsdkbklibynyytzjcpqmrapwwkwlttvlqvdgsopakanrgyhlrfsxuyzpyawnyrdmhhbghlblkevqtuhgrazbmimpmalnamgzttlstaggcljzlmmcwtbhuaovbomtzajneqchgwqlnzwhnrcjpeneqyrbmckufkyrthksooaoxkvqgfnohoeeivcwhunldzrmkwhryadckqdrtatphukrjhrxsqdvcejxekvgkkcbskehzrecxvuvnadclxgkdaiegmhzfzeybmspgzlutcgttcpuyfdzmzimubvogqtfajmoooiqjlfzyktoxwmgpahppxaokedmxcrbqafelklotrxouuugywfsvstzlckncdiigltxlxuisqesifqdagoxusslzfuyichofiwnzqyugyvbdhwrqwelhofkuqubcwzikwhhlmntmbcbcwnbgvkyarryrghvdutwdyufjcfzkeihqofyprwyiiuerkvhjkekathngdscrefdvphnummhzvcwrjreahjbuqtcbefkcthsgoswgnwaorwdishkvcknjfqegqtmnpjdgbxgwzgilfbchnqdtxzcaphjsmcnkviogbryggwuthfhanonczzcfarnpikugictpuhxxeldkguoxwhylqqdbspgpwazclqtsykpyftjcimxgvcjioizlwvquolqycloxugeapilciuplpvgmeglkrabkhxlosxpahhwttvowzdbrdzzpoxzfmrfpjgiyqeozcvmnbqonccziktdhlvbnthqswmbgwmmtffgdxykmunrdvyvujockngbgtjuipqovstsmmtwzpobnibdosgziifpvlveuteexpzqtsoghenuqxkbbgzmbxihackwwvanqhyfrqittzxbittbssvvktyniroepwpdclxjjxyorqkkqvpkjfqtdumyqujgtnkywcrwrskgqmscosbtutbrakevrnptvhwxhnvwfgbbfaegiopylciiaoflourgbqhfclfeysombwebelfimjwnnpwcfieynslfcrjozcfhrpluvkqjgldkocoljjxwnjgqwfwbykuvqqlfvotepzqwvhslefoqgdxtexddsvjurpwknntbcrrjfhpbrwzyeqloemnfpnofzpwbrjfjhjwwlzrtmfgnpphgzrvferwupzztdlwsgigtrjcddrnjmjfhfepyzmqiuakrvgkiqhgtalbzroidmjgjbwzywwjzzfsqctvgbovrzuezfvbweorvrjanuuyjxjoqnbqsuabpcakgsiicqzofwtllskcavbkjzlulpzzfxxcopxtvkkbnajzskgzsgtcderfmrhfpusfkxaigevppdlidujqnpaiprktfwzkipomvmiugxbldiofqbbhwpsxxuttxirybecepvcrrfqowohpgaskpwvomhckjknxcsvjiwdxuslijxmudvxvswuvzpqsdmqdbcgdhvowvueffyeyvnblwqsivflhqqgvufektfuzyylggtcxzxyyttdqjdpiiveozxmxktvntcqyrwgtxfslqogimqsjexqzhudrsnkdtvoyhcfyasfnczswpldleyshzwxtrwepwwtwfpcikvsfscqyrnkfznqhwygrtduyyztjrulqiyapsnvzdeubggfviidjsomzsvcakvgupijmsyijtaigwcrypmzrxvomzhglmgmzktmoxijfbkrtrushvjrhbvrqqizketwzwmuxechteezyepobmgngukmbbcyubeajfhfpxprmyonpotgavvjnxqjvaofibiyamslcpqhcxrchuglvbizmwnjtusdadrrvsgrchitovkjaupgkjwimumlzicohovrkaxeoupjosfgygafxdymfkaohjkwbvbtsktqsnulupvkhyrciqysghfgmlrtzfzefnktrqowkpaqikbuodgviuumhatxmovwlqmhngudjdedrkzzzlackiikpsgqrpptbklnabfwwewyjntejqcijcpkjrccyusbxnuytzoigjyxtzcmlnfumzsfjyttmdryxmtsegmhfpepqxbzvzrjrqumgswtrzjzwierairhuxvyxgwktzpvpwrfrsoqvhrpiowmtoiudcnqsfpcfjueimmgzfcnihnkgoqiuvjkebwrzfjbetawwvvtoytyrgducryisnwjakmkqiilmuluhzaxnwqiklmvpckiqlqdfmrfllliazkhharjejqafrahzzopzbhrfvkzbapumgibuwahbpwaijaxwkbhsxnjlwdcdgcbouviqzekoiswlzpqdopvbumlvtrffziaskblxxstcnkacpuzrwmggjzpvnsqidqmmvhqbxecmzuizppytltnjwuketfaxtmrodiqnorfymwjwczmqaydzxdchjwibcddyquuxeokmkibjtayfmsklbepdzyxynnkovtvnbkudlejiayiieptunsaghgsngeziehnjvhhjcryuerzwkgbdbmjsqbootguqwtwvswkzahyfsaquqoccughnwmmfpwcwsvurqgtnmlhbpgujwvqtnbcangwwcyrhqnbwvhzrykufhnohhuwjvzoketiztuzsvouyqjmbqvxcdoixrhwyssphoecchqbcdllvwluigqxxbqktmukioztgkpqxzwycjwsgjsozelceiqtrcguwgurqyojonqdtjawivchjswvaoabthlxsmzyikpdrmhwcrwqpbyvkoqhzgkjeleafhjawirbznlzmgggozosjprkirkyuxdidmgscrlwntwuhfrcwnccszhkziiygwvytptvgmshuqtxdxohuzvlqtxirgqavfsbqcsynqjmmicxtsiypbcsxghftboleiytydrohktcfxamzimhczyhclzawmdakrsrrhwagkukrpkkmgsaaopxsonnlexovseugsxbicgmamteihtilsjfrremhltfbxktdqziavxgidrueiiucdyxulbcdrqgfvzlfjystyoynlnobxeeimzxzgiticvemseblojwxeoddddiisvpyetufsnvsfsejniiiltenrsuitmargoieynvegmryvhhsuuvhivxeisgvlblkpvrijzoltgwlxxchpydbepjrbwpztyrbbziogeprzowbkmzkrqtcozjahbwbbscurnpxbzlsegkypubbsurxuvedgicciqemkibdtadyxjbsqrakdnbidqeepchecxutnglwqexdqdrpicjxgreyqlpwlrnkjdkdxlqilztwszxtdcpeevauarxzjwocktkjlvvynimhokxsaszegicqijolnamigfiehfxrsxqaaldzrthzjtlgkdostlsiqxvmormbsxexnolzxaedsztlgqifzlltzgsrbuxksmkzooirvispqagdhzatmbgbahlnbbtwkixsysvrxilzvxtheaeyzlpepigfckgtmhitpgedpvfyrjwagphlfqbvhpykregwdytryjzsiplibcnrpkbnnmvbirijyewgfeqaeeiwjznddiqtnqettigmfjmzbgmajnxrixbgbolutcrkiqeoqnntgholnvjcwhsffwhomfwzulnvjvhtrckzzocnpowxuujfqfvbxbfbpdmxnyhbeeesmkezgrjwshasjfxdgeecddpwbnkwiwijbjbprvptkqxckirtbfpkyyjugzwqbapiqajzwvboyvxxxdqcqtdowjsbqnpzhkpegrdihkbdnqgqinyrestcjcnzhternneocyqbemtpcaedepnghouzglayiyzswhzzigumqmjcpihyghebxvcmsismqgxpawqphnmauajgdmfzxhsdrsazjcmwyghkqbzwbymsahfjmguhjeldlsbsbqhmlgnbozpzzmoanbfztszlocyuswjgdwjueagbpuldsmitunspsjzdghoyczgyqvcrnguigfalzrovnvmaigulcpanoaqwonrsufgkjqrohurdyshbpkhebidqrouynkybwuflhixboeltbtqbnjdxhxkfutvbxmckjwhqhzjhzfhmkkokhivdotgkwvoldtzcjkflsgeeorobtfcbqhzcxuownsratbuypclrdistzkncjculoyhnwkjmpppvzswkuwugnxofblgzfmtjnimcassypuxpsnttbowcnhjfqorlzgbdpvitwtmzimbzjidmaiwmiikpvwzornspvocofmlvzxlrwthlhxglksznvjmpxxhbrsoicnbcdhxppwsednnfwhbnhjzmbkdircbqhydmnfmuelsthwkszhdthalqxhkwqmicuaripkmbboisdjelgageutceydzhqimfdrognjeouhrvkmzeizeffchniuvlbgfxbeaxsujplfslphaqpuzkcacfjzusdhlbrjkpgvbajykjigyzjzifrbxoegjzhmihpbgywqgootztbiqmtixsblvgjopfyvqcqwgyivdyeeyokxcrnnmiqpougudmpjyolasfbiddtiddrmqblnutnjffbinahslstrzxxxthaypkyjvpbtcmbuzmahkaqsfrsdwyovjzpeykxcotkjbbonqzubvfzhizxwjnadputqnjeqngmxnuelckfsylhqciecahxtrbmbtkgexuazfgkgdptsffhmyvsukzgbopjsoktoxktraaquksctfcgbwwrzakrvgzvfrkmvrdjvnqkpuhkivtcyxtmxviqcjefkvjkgahixxsjftlvqpqoqlnyprgullhemvlbesxavymbrjshsqctfcivuwftigermsfllqibyxbpgfjnoesjzoqhvanipqqskkhncwfsuwdzrhxzfmblthcsagnjokjctotqurjgwwfmjcaptgcrhgcaffqikqbnbknlsyldmqaeanodaqncnwjqqintbinebkygxwjeqqnmvcvvpytptxaeclefqcteilhddwwvcjghbfytowsnciuqawdzaijxfcyjpjkzwvgicqdxbrdulqubwltyijlviifsfwjjumimndlnialjtkpaykweiyqmzwqftzwtussfhonkvvcyhvfgsezduiowtgxlqlmpjuhczwpgjnvtnxraaebzmhtisxcajvpoipbiujsgvsfdclmmprqlfxywuscsyzgpkwzwqebqrbvnexitptmzyonqlcixnyiibxdfbpuyuacywywxiirnsyprybrdhdaslmimkigsoqqzggdincvbuwakolyzzeegfzlilsdcivjmylnhsgppwijfessaljzjkaghzumbjiqhinospcsiiuxwxsmbgjtnpoessszkvtsuwsoplftelixekmnuigumccigzwoygbcwvtmludftqwwynbhcmjaufcxfrvtmrvoqwdnfgavlbdvmzjafnaixjqyymnflhocpupdvwvzsyscihmmhikxzvqyovqpbelcucyqnaoxfpzscdwosjmtgzrmlrfxfzsgvltdcxtkmxowckavbsfnetctwcorsxdusntobtogimuyudeupaayiecehdysbtoujpklhmsfxlptxvmsbevqdsocbklcmfbzpfxaoloeimldgexkhjaacjpgfmecbzifunphzpwytkblnwzeaidpsqhhymatskrrcikailaazhflrgadcpiiabghfolksdfgzgstzvuhevpwxfknohvluogmvjzpycabbuwnvyqffjdwjjwxkseamjpiqfvifqjojiluuixezqfuctmpxwanepwhjnqaxvnucqcosfftbicnczriafuhfqgyqhveomcjbzusixktfwqxjdmbwijccuyneyesexvbpkaeiofwulkytyiaduhkztqdiaqevdywnsubilinazudyulpzqectiqmgxsbycfsuobjjvqbwvcpclptwwlrbjnsdoawmgcrmoparaapsuiiovtlqsktdoycuwzipxoiccbocwvnzujiyaktulzobrusvdgymulhmayiwuctrrxrpfffqssollpxcuhidswmvlmzyceslzxacubwbudhkectoxgylqbdvrmafqwmhntsjsfhcyrdcpumszijcjclcvsazfqnfwtmwepmxioyhkiyvppcrnetmvymlqmtzagjqdzjjiplozlscicuzmswqjhbwobwgwsvuhdnunyrfroavnwuenrfqczkblrwxbshzlijoxautkixiffvmwqmcblwupxajycebijtcqhcoestghflsctopdcxhglbveoislwgtisflkqgwdpyosrwjzidcwwzngaridcerxayirxzbavutdghizurzmqzxzbfjmehgaidpaiuvzqhbqsnzlkjhiewyfzhndnthncjlvzexlpmxajzavadatfnejhfuqvjsismctzulgsiclguutfaeaionqozdfufdziugbcvsetjiqvmaeacgswlkkkrvbrgpksfshadchexgqxlrvirtaacwnoitzkxuriamchnsitaixafratmxwltqwewkquewuparwlgqtgewdyuhwewxlgocbcudansynxckpfursjjdxoxegykajyiiwgvdwcxwkqdilaimrnnlmufzoqbxnlomlcdnnenthqkeyhrkivvpzrmjqstpxarxbxagmlrmiiawgrvsvmymjlfrpzzmdnqrzftfttdzfvisztmteuvurbclxwlvytrdeoerloeswrxaanvzhhmlhmjmemtpfffjrqifrkmuqswczepeoofrlylliomhnzmnhggkbumuzxegjtretxacgfpyypautvtxtdpanlnitiappppgyiqqlnhxzrwfqeudglxjhjszfbstukhdbnopuqlbkzqkjxkeuqezvwqidclnqjhuxadjtwirilyodxxqqccaszgcdjzkowiwyupcribnsxqcbzkqkzahbnnhutmslzpvpshzansjyhyfsrzddrtqywwoskjgyupxdzumdcqexsqrhazbhsctqwyahandrsnxxxttkaoglqrxxfzcyytfauoesjrmkrlqaniiieuyipkbinzatlzmoovpxokpooucbkgcagqzliuqonhjcdtmhjevnvluigyzppqpafeihrbyygwyrwgbrkqjarvhqjtrjxzvreycnghzrthirzkpmcpqfthxpnocvtbhhmhznsqrwbsjbqejhielnrufiezpmtdsuptzdqbgdxlggterpykhwtpyikaznktbqeotjonxjmyqmzgbzcnjevqjhdrtppwzernezomrfyxhxbvxsmueqheevbzebftapgzftcvcnzxjxsocphessfkvdodnqrfpzicdcfkydnklfiszhkirasdiwtoqysuamuwpiphevqfwxtpiduakkpjtyydacfltwjdorrvgbzlskhrdbjhucvcndmebvlzwcmmchlbsqxlhdmldfgbqyqexdupklyigjzeyxpgobclblgzzfqdlkkantfegcdvmwprelrjjgjjmxvkhsdxnwhmoitvyflnywqlfrqmttulotmevjqnjczjjqzpqksqvtxfuleohuqdrxckupqqtsmbpnvzvvmjoyldpzhckuvphyiwqkhwooaqpwunkgwbupafoprozaiokyotuimzhcgxlrnjxarvtecyjfumssezhavdvnzmabutkflagcbbsmjtbuelmqyfrjfjmjtxpdbkyxcafdbtegcjkgykopxytjmcokcrrdadknyzmaavgmerrraaeonbfngbwryzhvhhffxpnfrjzwfygazrpxwlupkboqbonjqoyfmotadutntaeedjiplkxyyezmwmnfomovgenabliuiujjfmaadcfmlzpflcvkaqahjyjrtwtvvevqkrveznydbedotgyhfpukkypurytykcjvjtpzbzkzxykyeasjuqhsvohlltiluxcxebyodalsbkrptbkqmbxxcjzeauuykhzgsvjpnkqfoequbqjtnmoatkbytlcerbrbtyjoccfsmemdtngnsyqbduboiuxbesxifvtcvgehsuvvaoyqexnxerweihawgldzdvfklzpfepxrnrmctipssrfcrmnhkyuaaumfivbvfpjgnmrezlthlltgsdgdqscmdicukfkbwetsvhvcxuutmpjavocijtqmufwejtfcsczwzpolflbxmtnxhxleyddnippochfqvxumqvkgoftlfxilxotaycfpvwsrhorykzuogwqkmjdvlgjpckksmhoxtmeckiuiynusttohqamykczumwhavmqgnhcdyucevhfapnhrpldgjtttdbgufgkckwmpllojovngjjdjlwsryhxhldqorynpzwakuzgwtiyzkrjuolmwrxlancrawnswpffrtnlzqabbmrdzlhgcvpbsviqlnivapmlgupvjniuxjzcwmsamwxbgvmhtggsenjlnlyyjfrkgwettnawiphqarjqrnmtskkdyysomcuoqkybflitsnpmbcxdvyvupmnvejqbvyidjafysvlcwdfzitrudwckmtjzeyluxwxvsgoajfuktyaibnmyiwqmgfksonciubtgpawdxstxoyrzrehwibycbmaampdrfbluaayhqhpandimgphxdkvhrhtdrhayjrgbzinfdkedgylyyggknpmwmprynkkoqcobqwgjjypobszmfbdovlxsnbelbgqffvnilyzssrvtoqlrttyiwbzbrtbrcxsbioszbpkqhbxcjsrywylrqaywnebhwvzfvqrwfgjwkivckgupijjtpcagzgoiwkogtpmdodmzlazurrkkinticzcsjoznihukcxypcizjuyayxtzowhgxkdsovnepmopjwsmqrusnjfqixodynxhcwvkhsikmhqoirbnbjqhbfpcnsrmaoonfbdiaxlfwvzsjeunqefbgovbmebttnpdmbbndoqlxwswptbpcnazaolvpxndbfzsqeckrqqxfhgrefibsufkeggivnuqnhepvapclxzbjzpjdfiaxntuizilwnfaezedxlgnexptjlmlqdedzmlyqlhyfktjkuvonkchxvrvbouhmaymedrmqhecpcyhpnqjivmrdinjnrymmtmtksdoobokozzulglidspyghhduskbjawoykhxqfbismzolxdeoccuqrixwnmrwpipgerxwettjhhhcbedjhlgtxsfxfnpbgucpoqblrojmvmtyjzhyqflflfxqoxhtpdrujiyoscfypstzuvelsgctmylyslakvujmihaztyvzhdwjdgjdxypwoalhniarwiisokkydeuhycqajfpwpwtrymzhvphsbidhyxrhsvsodjevasdsqijxbogmqnyaekrnghtojbizrtiahivlgxbobkaajbxztyfptsbxaqzewjmerbgnlkmlqvvfvxohsauycupemnhkibkaqubjddxnebgzikcnlkkuuifmmoexgthhhjuedaxdjwohhqlizjkqqnpscctaregbjeensgotszbwmsjdsmslgbqbonvplmehlwvedsmxxdutauimmuditybwyixpxpbaphbwuumanbsotqpmtkuaxohyyxybijqitwygolijrzrdbcfoyelvsbvtkochcpqrupszahxqbrambiycrhljtlrvjhemtxjvobldizhombmnxsfhlldkkjkdvouwurbjxlwpehdtziijeyickcyqgbvepjvtrbuljtcsygkdpvjymftqewxhenncjffphiccvvcjbplntcipgenhuueneltqmvfwbhycjdpckiahkvpwtwwhfoocowdolhjkgftarvutysmocjgvkshinsaadzoxfywyabuqvrdjmsfgpxpeqouufvnbvunjflerfytqlzbwbboqextxhktnwlbklbqgpqkgssgxzjdqcfjnlhlropjiinfebmfxatjafgaatucuzaedfqwtgiutnpyrvepuspvsftjbuuqzstyvtvapsabegzoyixqiddqqfykevieeomneaezzndcpntffddsqklnvwljeknybzihaaltdwhfzdtmwtpduqrfbcztkgwmmplklqlgcnyshcmslthmeowrhxfaeotnkykxtkyukzalqjqktdsigoolbexrvraglydpfiudhatohfbororilnguldjnpwivbitgqomqescutrdyupoubltgurwlgebgmdgojvrflrsoopqvzsjjxliocdcbbbmsozjcwszckrscfjyilzrhcjyfhrumvwenuvcpntgcmxvackvzoxrkbhzdggzpgrahsqntrynwjzpgyipwxvockgasttjmcraqbtudbojsqryhajtnwiathrwktoglmjrjuzcnbrnhcpgcvfqgobiyielvnujskzzqpceisnvjacifgrsdtjjxrntyytkmgijpfnqabgovwamolebcbdfikvqowgzwrhcnbontleancvijjycditwlevwmsdtqdzlnkrckndnginjcxuoczjwglslgfkagxjjuifmeithcwpbtyofyvaptttekdkytbircwwtxqqsvenolcybthqwctmllcavqvmvutpgjguuwwlfkhdsysqxjjiboqxuzyxyrsdedqqaxqotxjqwjgvfufxpyorroxqymndrassknniglpjfpriwcpwnwjzyefmwuhinuffgfvostdxyuxhinrddlnynacxtypvogklaeuldkxeofaaohmtslsslxghgsgtclobgkrnuclanoitxdyifjmlkemyzwudxduwkbjacrqvvlpaboivtqaumxhxyayuoeyptkbgszlpfvcjxwzbbsqdxgsbagfsvlqygqjpfyueunhpguglfxoprjtcfkdhkkqcffibnoncfuofbaidwawadniyuetdizjjvbwbtersvrvoufkwozgfaunvcvlkarcgkubcrprjasryblimrpzkevjpmqbxhyisuuewyupbpkuppzqijcetjehdkbrtvoxpqzghtopcwjfasxjiocyurtfnwgmgmincsiotgttiayiqboznjtdgigavrbyyqqsayoxbljuhooxhnfjeapnlwxzjxxehlfjodsgdkqhqrxdbylcipvorxougphazwqktlhusuejssxcqhxbfdiiwrcoyqgatbgdepbgopwxplvljahbivqtwdthfogaaxflgggsrrlsdyrasqjqfvwplnctvcnaysjbeypwmcsbvcpqokebjbsuqfavltuwqpjygopngmygibdmzxulaurkokvyugoegbnzzhketikplqlvijntjamvumjcthuumroxytsbroxcfwdredxybaiqgtsxhjbiimynnmjdjqreobaoabuskmcshnsajkpiakgipppfhhtkbunvxihdfslzckeoqvyzckwlqqsehunjpyamvqqfjwwfqqrviavtpvcezmmroniwqztpcazehhflvpsgbygfmzkpzgjyzgenmfadmoiccsvwxhxzqfvjhuoqwiblzgkmsjpfuqijnhhjddgejfdffulpeddrpxtsyafkuroutryutumfuywnszjqvyacyclagxjehhpxrfitjxixsktnxzbiunwgwlofwdtuwavfjltxdrfykdgnwgakqaxufyznrfqqjaktyfsnocvafxfwkyrptwmptfpjbghpsiisjlmzalixrqeazfuncehxgeintnturxitfnvqheijqdnbjilulhhbquuxthjxusxurflubfnunvobmvucqvuoosawjyxuvqdtpfozxvzdxrgjruwqqnyvctqoorxiujdwkysrlmmxscpincfasjbynqutlnlozeilekmykfqynhjecgdhwbvgonvmlruwhbwmvwiotihvdjbkvqtudhrehhywtanzzupwzumxtcqbsdzkczzqgcnamsghentqlnedtyvcshifougrvzkjntzwrtqqkzbkzhnpfxaterxjdvnskqkekqlatcmpimgxyinzwlkpnsmnklqxmruvunmptadgrwinknziqpmxqmtedrgyoupacvwzdbklzhvdshzcfcwbsfyidfnnwxuyvmecypchduhubmufczwbftgesvqicjggxyvwhkvtxkoddnphhfkpvmqcedseeydqznczeazqqyktsqkamseylxlegtvsavkebkxsvrfeadnzhfbfanhibpwaijncfnwlivoznkjyywwhtezyhshtvzlrsixlquljodlcoixzcunqkxlndesvpxbrmfwktseacwgqcifnmhcplncjdcbinbciyplribdlmegsilpasvntictqamrmprasernzahijxuupsjmnxvbkcbrghbnoceogywuhugfrqydsdgajcubwwfglnoaiexgqpaforyflnaqtosgudqqgogtpeimlaslovxezjuiyloznqswskqqdsdktznyppwhsqqaxelatbtzgbyhcqbsefhohpnozffsleusdkhedhvdsfoiwdjhoyujrimiffcwqvdytpuejzcuqrxznhvtehtaxonsqqxayumbcfviwsgdmvnauhvjuxtokuqgwppkpcipjwugljbettxkyjfkbcwieybfibeuyrmpkkxnpfaoelxfggnyfzzlzfcmhqdsdzigerqotodkvlsibncunjoicwtecalzsgzvinksjwknhspfehqjciiniwjpogrkytnqxotdjcocmrmetiihwxvxnffxqqljdhqdekflcfjzrpyhsgnjdxgchckitwcyipfcamihbvezbymqhddpdkiehsjppdhwlfqhsrcikqwilcqhdneybmkhveocfzwvtoyghsnugtwryuejjpfxtzppporpbntpmjhkceygzluvicenmwhwycowxarzsxlqyuwcpgnilaxinwduejxyrpjpmqnpfwsjvktanjjneqvlvkuwnhxhkirqhythkrasnahtlvkcuointmchdidvvmqwoeppaevshctxivtlqexluklyxyqdabifveyahpsglcfuyaultynnhjixpsycnunxarfcmfiwuvehdhissyhrtchgdzgfgkxnqylejucafkfhvorqjvhreevvvbhkvylpuionfyahvmudyunneimftiycpxsqqbbzcegsyltfkwqdjazztjjiebdtkemhcfvwmxfnatjqvoxdqyhhqzdczkgasxnldjlcqnebfalyazhujkmqejznxompmohogcnjfborjumgqmkgpzzoufewmbywnnlqwrwkrtleggiefdflydtemoeewmbdzibhwwiotbnjcmsojqkbqhkwuzpsbwpkwamgiiqivymszmtziulsolowbbrqzjpxnwyvgevqgwgraovldlzfugmkpnslvichbgspyxknspvluoismyprbkpppnkjvryrqweiexowbekuuklairxxfewlhfslxyanacjvqkdkqqhathzcwmnrosnlugoxqcxbhseibofheohmnyknpdhqjvimlecjlhvxgpuhuvqjaejflyqdobtbriemaubvtwcsoizhmkcrqifzvgevlydriihbbsqfozcfijjnnpihknkzgdvexkjshjhtornqgwcimnvkqkvhjeklupbnqdxnhurmraiioifloswmagsmjqeboqkobbvblesexbwfiziadejqljrnbjyberwpsfciggfnqaicyyfypdalkkfjhqemntmcmnfurrostoisdyfwxxbdmmxanostimuqkztsghwmboqnjhoasrpcxneemhunnluxplnrwultuncrzzndwitdhreijgzsutrctmghpkoxjkeoxmieaubqzvxcjuqqjanghdhlhdnekpwesymeaiozabmxvlgvewlltgowzjzplzpckgntmvfbdivlysnnhpxrmazbztmrtpjkvgznnceddghfdtcgltrvwunnopncgnmbaqqtifnziubwevufrqllbilrbuqdhrvcmgmoxtroimvkczzsiezvtwmlfgjlnyaxpzrioctkmedzuvwlfgvxrepkctbhrzdonslusyalpadpyjgstkgkqiorixbvhdgudzyvuuzdstdkvidgsujtmzphsvqxjltxkqnfiyrdpucvmugvnabjhstuxdnhmqbxfixwmvmzhgqnquqcjyfglfefoypjakixllcaemfuuazexlvhlbwktxxqetzxexihmpkimjujvkhgudtmsedpyjdelbraaydbasfwbhuwbkaigvciqgvrgzrqgruqehugmoyaujhnxzogyqpobhwciuxztlcvhqrvjhjjgpvlixntikfkvspaclrbddpijdpiryhtoajjghpfpvtxqlzjznalfmgwwtvvuviebaaptgjsinebufhlgesncboevczswsouhstsxcahnlwxlnwpouqtnjuhvzahtlstimigobjepkuqmhfkrknsfhldnphbrqptolrxmycilqllkcjrmpdqxnsveobmwefoeefuutmicwsrsrbekfpvhscwzyvgtokltnilhkijrmiewosuwbjbdryoawjzqnexlkjfaartwehefyrslufrgvppnckfnxzgyuzjzgypsrhlwbhwgtfohsytzoslrixcxpvcylamkoblmoejlsvlqgyumhxghkvgwwmkejeckwlbrnfxpoiwxpahtltvbbhzzuvtqdotjsyjyyytlomfyawnnblliiowmxhshqmdgwkretjttggogbjgxdkwaofxxtlwhkvyxmdjdlkiwcswxxzsdxlmtoyykjtjwzzdjzhkmnlqaozfjlkofztppugcxgxxizlkkqhgpobxqsnoamkamblhtrerzinosuxgclctqnlcvioqibgxufapmoxggmbvsjamxtelqamzkgddpygcpnpwdrijnmyrujnmfivdlhpkuzktxkjactwkdudcuybdpxvwtbphcrbwnqbddqspjyotoxneshfdcckucyyfbazvbelomubpbjzmyfeeglifkzygiliryocltmkgadcyflbfgokmqmfzcbgviqiuleemouepcxvgbpizzwudhfripuwyjjqgayxbqtnrgyjtvkmhxpdsdnncoxhmrvbldgttynahuiiyivsppsifadquobavhzctpteaazsokgpvayrjitfvhkzqvfyyzgjooywpfajrqgqizxsazordygsympqvxyukdemgijibaodwobmocxabhzcpezbxuxtxxkyksrlfdhbdffpprvregcuiexqdtjeiybmuvbbuftqxsowyepubxdcawhujiplgzszjqsqrromcekoazudjmgsyghacrhcljffipzkwiskszrmcvkmhorkpjixdqniandytzohfpevllodwdzvwwoibefgeufxlcgqtmcvtdnbbkjxajhuieojvemavjjfitirjugwdpqvjmgbuahmqkfprabluoxwadcjrebgbmaammwlrdvmlqqkljuewtyhbyhtlvhplxlyfcwgtfwwfeiopsolgyhsngwfbdczczbcvrntjmznsfqbugtqiwpqgjdxxoxmuccwfympsafvdiwmauvyeswoqyervcsbugzhotrmicwokglxutybrxjdqioawmaxfqvlytdqphxmoldburkazdarotuxcjtkagdiysxedwjezcmubhcztkfmiulmxsltnfybnpizzvcgwdaazteqokqreuutoaeljtjbewgeqpxtsmwcgkxyvbxhhrxqbchxaepslntpcrqmjjrhqqyfqphbwjjbcdfenqlrkrqfftkrvqabxluoppvdbxpulzpdzlghfhduyugozrcfqppuehojlqprxqbljzqtfuyvxzehkmhggizrrzwzcefcertsvzzdepbjgojxehqmzhtboxkagypvkctafwdpdebrcntfpwyuzwlyptqtcutamisbombgazjmcyjnbdbgrldjsmqrxwenpjrrijbkqyavrkkbvrhjomxhxtzbrywboqvxagdccyoloidxvbfntpknjgnmuqqhkoirpywsgrkbofrkewavxofoskmoryfztzwmsiiajaulasqbbkcrchooplwzqrtxqidhqpjenmvfnpeaghsuhhpertjsvuogxgdppupsjpcnctvtssuizjhrssntschwenaetpnlkgympdaqqxvvfrtkaqccoybiqseumryybljylsyuynnqiytqprljqzllunyssxdfaipocjkpximrgtnhbfkwcytbpchbqvibbkiorfgliwfunoyyaiftsfrauabucuohpihdntcgplvbawvicbblnpszpxcudkgdyuszroafdadwekttaknmbyxkgriztfmuyyvekcqalfkrdzjhwgboxxapmxlkgpuweopynhiubccvlzukqbriowsesiblndcfcqlcjykuqmopmbqerxvfhywtuzetyogyitqibcqvswifqnvumgzfpjrqgygijfbmhmgfzwhqakfvrblerszzlesdnnllwtimvhipavwqdibvpjjwrfbwkyczfjcwkcpbjakssutowrrjkcesmkcyjluhkahqokkmdlsbvienmngtxfpwyurphbtnkeuvnxdihdleeifseckaizwslqjlkydzsqlupnxwpcntcsnlwacxarbtgtculuigtetynnaatodhggtzyhgwdcpougkkggdqrxtsynrtuetnitxwcqmlssexosqlefcalvkvncvzfocoxboghnujylkjpifxiiaxfaxyfotxffyofmfbptymzpipjosqushxgvitbdlduddaepgxlpmrkiakxamoxwrgrhgmcyflbsdcvxiprvktqpkqpgmibyvbcrxgecojyuyqcnfjslchpscwseijrlxjjxlxvhjsdzgpemlsqrutqvlntzgzrviovszutaqkzxlqhbbnruflwxhutwevbgxuyztvexmfyyfhwmwirkvegesvxsaybxfrtbktnglzxmlyemujeuzomrvzlbrxcamvulgpfnsrtkogukggrwhjzdfbpfmscqgmpueufwxgmpntkovxxilkdheuzrdefmjkehkcsylbcxynhwavwnygzckswmfsinpadpyihyemokowscfqouauqbzewegjvhphxpxwwvyfhyqhybtejetrfmvnfklvtkmjpwulzvipdjhpgkqidyfgtgttgcaxiihxxklljclbwjndbeusrfgtephinscoeclrwmrepcjcdluncacdgzstmjzozoaolyafybbjpscfjbdfnfiqihawaowshtucysqmpmrampmeknsksjzebfrjjcftvuyyjrvikpszmcjdijokjykuvqqjlnkdqugcekvxdytfayukknwlaufzhhlgacpcgeqphyivdxgqzafpqlqbasofubbxxufbiyixdbgtghfvywbatsyxnkivckydgmmuocyufbusrcaalidpkbwpmvkvizcsyvkzxtdcmqbhpdpugqclujpfmccvuiuyqsabpazxxrtytaxsshjtevqttrichrpgbxgfrxzicwfyhnwxakiqijachnsgsgakyumuxwfvoijhqzgjpqfhzabguownuvqimjrayjegfbdlraetfnbyfcxisxtayqglwhlknbivgiryfnpfbphcnoryisoofrnxjxhrigqobhfpafifcfygjucpfytcgauaxlkzrpcvnywrjxyaoejdrvnrvkujbsbwzgrdmcldiwiujarnelbquebvnzytqeljekrkngsggzcwbrgektgqsmbkkgbkmthuyrvgmdttbtwypqxfjggtivrrwhhslvpxhvefzanaoobqnthchjoxtyfxbkxdfxeprqfafoyjopgcwvrbwngmpteigzyneqtqbvcgpztfqhpoqyoqkulpoxsqgmsqbufuqgbyfvoxostzzocotcnhcrwxseuhdtzbgfxtfsijpzyywjmuiiodajxltvpwkaknxzcjuuiivmaxjypqejxlyfhxxjukerdkxzlhwjohzkxdicqrfktvfjduipknqluryvizmkkjciwvqzmwvlemwplxxzdeamzrdsdetouvvxhlrrrvunbrlriogcmrhiffwxbnbyfbrgycojfdatritwhjaaqqpubilaqewgbbhtphecpiadkdqsrmrbzhviqvvprihqgdmrklfqvntnpjapkzomgvqgibkuebiyfxyobsmrhviffjardjobijxmaevwjjpxkcahfncqztjtfxpxwqerpvbvqzvqhweoussmvoermkvybpadbaafdiowprfwjzjwldteqmhwfyjnjadveyaritrrlvqlyoghxgfpfbpyjfkqcjzqxqljpjqjrdzwgobwmvuwpkczpfsfljzioqzyrkpgzyuplmxnsmpjltrxtpxsfzwqquakykivkvzgplbxvmwydqmxyswfuvivbtxjttkhinlykiljybkmumaxnvqqdmxvaahmutngmcbtujwqosbakmmkkeyjenhqdvotllvukgafeijmkvpfwvteaylsiisjiixjlwhspsrivgbgwubjizvlweckgbqrxxlgmncmhknjvvsaalczqizkvqoognhbcargyqbkzlkquaqbjljbbpvkkmmnjfmsqsgmomcgsbcytbkyupctokxrmwfmoggrvsqdgjmtugymwvkzexjipyfunwtuisrfrbczjsjvzcobxbhscagjcknomhbsujcrlwoduwfrdrletdkbuvxxngoesqmkkagtxplpvqdpqxtplfzvpqglxjqpflzowwfooswklipqtqtijlmhvvztasgrngqbhijqtrfrgqtsiwbnbzbsollbfsirgvvogvhxsdmjdocmzhmwlswbjopowjdjjgsbecdacpzjqraakswqvdlaryzkxfeirdghgruzeucyxolbtlzaqnddchqwloqnbotqkwvyxwxshmmzkuzdqtockilulewxwigvzeuklmkqadwkakohpgglatcarqnxmlqbxsaqkwkshckhjmfhjoeiljeljemgakiagafbwbqftcroznawusvtwtxdstjpqtsphckjaiycdtfrfdlyputbnkgsmcdaaawyawuftqxcskqeohfnqiphpvooqdrcpvalararhbgihpzpjwkldgwozqxgagkpjkwantrnqfuxjoaywepyosrxogylrusjxkbneksmwlelyxdunbnndilsevcxkxfhdriikgqxpcxgdtelzhqqpapjgwtwwxvnfjwiqunojfmkjciimrvvrzgdwvlwgigbagpfozhmcihjsewfjlfhfcnszctkpzgrymbbcrybhsisqdvsiasoysnfojefubzmyihalvljigsnsidmqxwjtevltqrogaqpktizfnghriamfqokkxkwqgkvyypljdqyfuafrcadcsmordaaitertfkpxoshxpgbstwteplcgipbstqlvxruhfvtnhaigubkictozcaelwewqktcutfmxizvduaiaplefhplgfjpxnftqkkzkexcnidvvpgzjifavucvgvcatuhzfnwqnxraxkplfxpvpsrlratnlzhvkylgsrwamjffnyuhvnsrysvaesgqbrcaehowdangtsntmbjszzawewqxksmyppttfmtyhzmboymesncdntphkwkgpskroliejnyseyutfcicrosvtwjcccezsnsgxebhularofcfgsdumsbhzevppssfarmcicphfsnybfaldfoiowcikultwrzuxqjcigmjeuakfazukzdnkezmcpdugunubysktpmwjubdtnxzgyrngesojusklmdppxpslumbvcevwbxazdcmuakxuchhbusxaoqvnvmtlapsiqtnjfgvgnmaqtjktfapqbtzsolvrwsqlqfxykshxnfjjrvyferjaewetgiyddrnimvjhmdqwwzenyiuzronckxnnodazaeqowprwbcvsdzxscvndnmxbebccxdkjwnkuleylglvoprnnzgusvwocycjgzfzuyhplclxdwadobnqjcfloluupjshukovpgccojrxzcsmggughzkzrhsnfmssqnhisxkdyunmogzjxzldpzphjxcvcpdtwcoaztsifostmdopxzuvukrnwvgalozpcvycymzwneeygssfuxdqbqtpnqvkxaqhyejpdvejdtcmpgcugxncjvglfqztwnrxrqvaxthuksvqdalmqbxpwfssbdkjoclctlvvkmqnngoeshmtazkqbtzpbdimuvswvasodckozcrreeeiudwywnlzxgvlbqbfjbvijisejzmvkfxllryapyxwrjeacdfgguxxbrdjupbismyneuttrnauapgjicqdbedkgsnuebhkvepljsvfixqvqwoavsskembsyyaefbsyxbaesoynmrsqpccfueabllskgmxujqdmrlkxiugozntxastzvzncbbwwrvmrsrlghjjgbkphnhykbyqbbywezfpmeuqznsuhsmssjqoglxjtbebuucyzlaajgrfkncdriwxgornsemrhghazgovwpamrudrjhjtnsdentksopnsdpmhxygznjpyoszttsimvehzsxqpbbkcuvffkquwrkokddkmwudtdhzvceklazvogmdofanjjkdbczzxolaujlljtxqdoonupjqmzmwszxgrljuektvcfjxwqraxivhnegvsnunrokltjelqjxdyctxangjnlnszqxcbigppxgaucskvbgmlrplmyukngrmblhfqsqlltfjjkmqxokvdqblrlguzvcypsrhhbkmsmtjaoxquptdubypwmyruslyzdnlzsroyiuqchimvyehgympxlixalxxmdpvpvaswvchyedddfaxyowanhvrozlajbttqasrspcdkgvyxskxdlqxpdtxzonvgufrsaevrdltwmuzfuhdyrkhanoedfdtqwsgbfieqerpxlnfdojtmorugspsjmceplbkwzezsidqzakkjpugnuzmuwfmqnzfgdfifvqqsrbuaotpsheriykkgphbtoxbihyutzsyhynbaggmkzpolaocidyvgbupekhjxxkbbnlcfnyfmednqslktswcinebisfxwrnoqkhvgoomtahkjsnuipwmdqqalwlnipblfnxsfxaljmynommfhojsceeodxrbeapoplvltsxxycppeaoqjtrxbilcyubsyqvatzjzruggnbutaqcuustoaeeffowamrvlpoocqwiwnpbxbqfwuaaevkvehkrpmyclrexemvcafgcpggxmmqvakiiuxzwhyyymzytaywtlumxicnuhwrdpcuvxwrqiogvrwppdtthvvubhflufhxmnxkkdwhhmjrhitzviqiyhwbjkllmlblipxpqzmzwibjwvvcsryefppdmgddjecxeiuzefqshvuihefopxfyaewyrvfpducbslavotxblgqvwkfqenrnokshgucyzkawleqionaxwphwepcthhpihhksabxcjfdtkjqqtnazaljjlfspwyufclbtvbnddzsxafjbzltugvvguwhjtfbmwibctqwxmazyyozhgolupoipkswwzdxiqaygssfanbhqbpjaamxoyimofjbxogopvpazsnvxxqtfeioblkactmsconljxtluvaqjxufqolnskmnljllckrmkwwfasgtadzijwwgbxrjlnbsqlvoavwadnggxgggshvvrrbqqtyoejpkodpdqecqxhmpeegsumjlpypdmugrtwdiwdgwrfkavo";
+    iRet    = validPalindrome(pcStr);
+    printf("%d\n", iRet);
+
+    char*           pR                  = NULL;
+    //char*           pWords[7]           = {"a", "banana", "app", "appl", "ap", "apply", "apple"};
+    //char*           pWords[]           = {"w","wo","wor","worl","world"};
+    //char*           pWords[]           = {"n","j","sl","yyd","slo","jk","jkdt","y","yy"};
+    char*           pWords[]           = {"ts","e","x","pbhj","opto","xhigy","erikz","pbh","opt","erikzb","eri","erik","xlye","xhig","optoj","optoje","xly","pb","xhi","x","o"};
+    pR = longestWord(pWords, sizeof(pWords) / sizeof(char*));
+    printf("%s\n", pR);
+    
+    int             aiArr1[]            = {1, 2, 3};
+    int             aiArr2[]            = {1, 1};
+    iRet = findContentChildren(aiArr1, sizeof(aiArr1) / sizeof(int), aiArr2, sizeof(aiArr1)/ sizeof(int));
+    printf("%d\n", iRet);
+#endif
+    return 0;
+}
