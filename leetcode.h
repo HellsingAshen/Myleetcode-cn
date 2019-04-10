@@ -182,6 +182,11 @@ char *strrev(char *str)
 
 #if DESC("binary_tree")
 
+int isLeafNode(struct TreeNode* pstNode)
+{
+    return (((pstNode->left == NULL) && (pstNode->right == NULL)) ? 1 : 0);
+}
+
 /*
  * @ desc: initBinaryTree
  * @ in  :  
