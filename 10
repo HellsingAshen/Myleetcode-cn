@@ -104,147 +104,6 @@ int* nextGreaterElement(int* findNums, int findNumsSize, int* nums, int numsSize
  *   Output: false
  */
 
-/*
- * @ desc: initBinaryTree
- * @ in  :  
- *          aiArr 
- *          iSize
- * @ out :
- *         target binary tree
- * @ cautious :
- *  n pos in arr
- *  child pos is 2n + 1, 2n + 2
- *  
- *          0
- *      1       2
- *    3   4   5   6
- *  ...
- *  Child poionter is null that arr value is 0.
- */
-struct TreeNode* initBinaryTree(int aiArr[], int iSize)
-{
-    struct TreeNode *pstNode            = NULL;
-    struct TreeNode *pstLeft            = NULL;
-    struct TreeNode *pstRight           = NULL;
-    struct TreeNode *pstRoot            = NULL;
-    int             i                   = 0;
-    int             j                   = 0;
-
-    for (; i < iSize; i++)
-    {
-        if (0 == i)
-        {
-            /* as root */
-            if (!aiArr[0]) return NULL;
-            pstNode = malloc(sizeof(struct TreeNode));
-            memset(pstNode, 0, sizeof(struct TreeNode));
-            pstNode->val = aiArr[0];
-            pstNode->left = NULL;
-            pstNode->right = NULL;
-            pstRoot = pstNode;
-        }
-        else
-        {
-            if (0 == aiArr[i])
-            {
-                continue;
-            }
-            pstNode =  preTravel(pstRoot, aiArr[i]);
-            if (!pstNode) 
-            {
-                return NULL;
-            }
-        }
-
-        /* construct child */
-        if (iSize >= 2 * (i + 1) - 1)
-        {
-            if (aiArr[2 * i + 1])
-            {
-                pstLeft = malloc(sizeof(struct TreeNode));
-                memset(pstLeft, 0, sizeof(struct TreeNode));
-                pstLeft->val = aiArr[2 * i + 1];
-                pstNode->left = pstLeft;
-            }
-
-            if ((iSize >= 2 * (i + 1) ) && (aiArr[2 * i + 2]))
-            {
-                pstRight = malloc(sizeof(struct TreeNode));
-                memset(pstRight, 0, sizeof(struct TreeNode));
-                pstRight->val = aiArr[2 * i + 2];
-                pstNode->right = pstRight;
-            }
-        }
-    }
-    return pstRoot;
-}
-struct TreeNode* getBinNodeParent(struct TreeNode* root, int iVal)
-{
-    struct TreeNode*    pstNode             = NULL;
-    if (!root || (iVal == root->val))
-    {
-        return NULL;
-    }
-
-    if (root->left)
-    {
-        if (iVal == root->left->val) return root;
-        pstNode = getBinNodeParent(root->left, iVal);
-        if (pstNode) return pstNode;
-        pstNode = getBinNodeParent(root->right, iVal);
-        if (pstNode) return pstNode;
-    }
-    if (root->right)
-    {
-        if (iVal == root->right->val) return root;
-        pstNode = getBinNodeParent(root->left, iVal);
-        if (pstNode) return pstNode;
-        pstNode = getBinNodeParent(root->right, iVal);
-        if (pstNode) return pstNode;
-    }
-    return pstNode;
-}
-int getBinNodeHeight(struct TreeNode* root, int iVal)
-{
-    struct TreeNode*    pstNode             = NULL;
-    int                 iHeight             = 0;
-    if (root)
-    {
-        if (iVal == root->val) return iHeight;
-    }
-    if (root->left)
-    {
-        pstNode = preTravel(root->left, iVal);
-        if (pstNode) return (getBinNodeHeight(root->left, iVal) + 1);
-    }
-    if (root->right)
-    {
-        pstNode = preTravel(root->right, iVal);
-        if (pstNode) return (getBinNodeHeight(root->right, iVal) + 1);
-    }
-    return iHeight;
-
-}
-struct TreeNode* preTravel(struct TreeNode* root, int iVal)
-{
-    struct TreeNode*    pstNode             = NULL;
-    if (root)
-    {
-        if (iVal == root->val) return root;
-    }
-    if (root->left)
-    {
-        pstNode = preTravel(root->left, iVal);
-        if (pstNode) return pstNode;
-    }
-    if (root->right)
-    {
-        pstNode = preTravel(root->right, iVal);
-        if (pstNode) return pstNode;
-    }
-    return pstNode;
-
-}
 bool isCousins(struct TreeNode* root, int x, int y) {
     int             iHx             = 0;
     int             iHy             = 0;
@@ -370,10 +229,28 @@ int findMaxConsecutiveOnes(int* nums, int numsSize) {
 }
 int main(int argc, char* argv[])
 {
+    struct TreeNode *pstRoot            = NULL;
+    int             aiArr[]             = {1, 2, 0, 4, 3};
+    int             iRet                = 0;
+    int*            piOut               = NULL;
+    int             iSize               = 0;
+    int             i                   = 0;
+
+    pstRoot = initBinaryTree(aiArr, sizeof(aiArr) / sizeof(int));
+    iRet = getBinTreeHeight(pstRoot);
+
+    printf ("----iHeight = [%d].\n", iRet);
+    piOut = deserialBinTree(pstRoot, &iSize);
+    printf ("----iSize = [%d].\n", iSize);
+    
+    for (i = 0; i <= iSize; i++)
+        printf("%d ", piOut[i]);
+    
+    
+#if 0
     int             iRet                = 0;
     iRet = hasAlternatingBits(4);
     printf ("----node = [%d].\n", iRet);
-#if 0
     struct TreeNode *pstNode            = NULL;
     struct TreeNode *pstPNode           = NULL;
     int             aiArr[]             = {1, 2, 3,0, 4,0, 5};

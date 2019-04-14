@@ -1,5 +1,7 @@
 #define DESC(str) 		1
 
+#define MAX_INT(a, b) 	((a > b) ? a : b)
+
 struct ListNode {
     int val;
     struct ListNode *next;
@@ -15,7 +17,7 @@ struct TreeNode {
 #define false 0
 
 /* Declare Function */
-struct TreeNode* preTravel(struct TreeNode* root, int iVal);
+struct TreeNode* getNodeByVal(struct TreeNode* root, int iVal);
 
 
 static int
@@ -231,7 +233,7 @@ struct TreeNode* initBinaryTree(int aiArr[], int iSize)
             {
                 continue;
             }
-            pstNode =  preTravel(pstRoot, aiArr[i]);
+            pstNode =  getNodeByVal(pstRoot, aiArr[i]);
             if (!pstNode) 
             {
                 return NULL;
@@ -260,6 +262,94 @@ struct TreeNode* initBinaryTree(int aiArr[], int iSize)
     }
     return pstRoot;
 }
+
+/*
+ * @ desc:  get binary tree height 
+ * @ in  :
+ * @ out :
+ * @ ret :
+ */
+int getBinTreeHeight(struct TreeNode* root)
+{
+    int                 iLeftHeight         = 0;
+    int                 iRightHeight        = 0;
+
+    if (!root) return 0;
+
+    if (!root->left && !root->right) return 1;
+
+    if (root->left)
+    {
+        iLeftHeight = getBinTreeHeight(root->left);
+    }
+
+    if (root->left)
+    {
+        iRightHeight = getBinTreeHeight(root->right);
+    }
+    return (MAX_INT(iLeftHeight, iRightHeight) + 1);
+}
+
+/*
+ * @ desc: deserialization binary tree to arr 
+ * @ in  : 
+ *          root        in_tree
+ * @ out : 
+ *          iSize       arrSize
+ * @ ret : 
+ *          outPutArr
+ */
+int* deserialBinTree(struct TreeNode* root, int* piSize)
+{
+    int*                piOut               = NULL;
+    int                 iHeight             = 0;
+    int                 iSize               = 0;
+    int                 i                   = 0;
+    int                 iStart              = 0;
+    struct TreeNode*    pstNode             = NULL;
+    
+    /* arrsize = 2 ^ iHeight - 1 */
+    iHeight = getBinTreeHeight(root);
+    if (iHeight > 16) return NULL;
+    iSize = (1<<iHeight) - 1;
+
+    piOut = malloc(sizeof(int) * iSize + 1);
+    memset(piOut, 0, sizeof(int) * iSize + 1);
+
+    piOut[0] = root->val;
+
+    for (i = 0; i <= iSize; i++)
+    {
+        if (piOut[i])
+        {
+            pstNode = getNodeByVal(root, piOut[i]);
+            if (!pstNode) 
+            {
+                goto error;
+            }
+            /* set val in arr by index */
+            if (pstNode->left)
+            {
+                piOut[i * 2 + 1] = pstNode->left->val;
+            }
+
+            if (pstNode->right)
+            {
+                piOut[i * 2 + 2] = pstNode->right->val;
+            }
+        }
+    }
+    
+    *piSize = iSize;
+    return piOut;
+    
+error:
+    free(piOut); 
+    piOut = NULL;
+    *piSize = 0;
+    return NULL;    
+}
+
 struct TreeNode* getBinNodeParent(struct TreeNode* root, int iVal)
 {
     struct TreeNode*    pstNode             = NULL;
@@ -296,18 +386,18 @@ int getBinNodeHeight(struct TreeNode* root, int iVal)
     }
     if (root->left)
     {
-        pstNode = preTravel(root->left, iVal);
+        pstNode = getNodeByVal(root->left, iVal);
         if (pstNode) return (getBinNodeHeight(root->left, iVal) + 1);
     }
     if (root->right)
     {
-        pstNode = preTravel(root->right, iVal);
+        pstNode = getNodeByVal(root->right, iVal);
         if (pstNode) return (getBinNodeHeight(root->right, iVal) + 1);
     }
     return iHeight;
 
 }
-struct TreeNode* preTravel(struct TreeNode* root, int iVal)
+struct TreeNode* getNodeByVal(struct TreeNode* root, int iVal)
 {
     struct TreeNode*    pstNode             = NULL;
     if (root)
@@ -316,12 +406,12 @@ struct TreeNode* preTravel(struct TreeNode* root, int iVal)
     }
     if (root->left)
     {
-        pstNode = preTravel(root->left, iVal);
+        pstNode = getNodeByVal(root->left, iVal);
         if (pstNode) return pstNode;
     }
     if (root->right)
     {
-        pstNode = preTravel(root->right, iVal);
+        pstNode = getNodeByVal(root->right, iVal);
         if (pstNode) return pstNode;
     }
     return pstNode;
