@@ -205,6 +205,7 @@ int isLeafNode(struct TreeNode* pstNode)
  *    3   4   5   6
  *  ...
  *  Child poionter is null that arr value is 0.
+ *  ele in aiArr is different.
  */
 struct TreeNode* initBinaryTree(int aiArr[], int iSize)
 {
