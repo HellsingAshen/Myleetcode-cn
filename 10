@@ -230,8 +230,20 @@ int findMaxConsecutiveOnes(int* nums, int numsSize) {
 int main(int argc, char* argv[])
 {
     struct TreeNode *pstRoot            = NULL;
-    int             aiArr[]             = {1, 2, 0, 4, 3};
+    int             aiArr[]             = {1, 0x7fffffff, 1, 0x7fffffff, 0x7fffffff, 1, 1};
     int             iRet                = 0;
+    int*            piOut               = NULL;
+    int             iSize               = 0;
+    int             i                   = 0;
+    pstRoot = ConstructBinaryTree(aiArr, sizeof(aiArr) / sizeof(int));
+    piOut = DeserialBinTree2Arr(pstRoot, &iSize);
+    printf ("----iSize = [%d].\n", iSize);
+    for (i = 0; i < iSize; i++)
+    {
+        printf("%d ", piOut[i]);
+    }
+
+#if 0
     int*            piOut               = NULL;
     int             iSize               = 0;
     int             i                   = 0;
@@ -247,7 +259,6 @@ int main(int argc, char* argv[])
         printf("%d ", piOut[i]);
     
     
-#if 0
     int             iRet                = 0;
     iRet = hasAlternatingBits(4);
     printf ("----node = [%d].\n", iRet);

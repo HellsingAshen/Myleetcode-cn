@@ -1,6 +1,7 @@
 #define DESC(str) 		1
 
 #define MAX_INT(a, b) 	((a > b) ? a : b)
+#define FREE(p) if (p) { free(p); p = NULL;}
 
 struct ListNode {
     int val;
@@ -234,7 +235,7 @@ struct TreeNode* initBinaryTree(int aiArr[], int iSize)
             {
                 continue;
             }
-            pstNode =  getNodeByVal(pstRoot, aiArr[i]);
+            pstNode =  getNodeByVal(pstRoot, aiArr[i]);/* not support binary tree with equal values */
             if (!pstNode) 
             {
                 return NULL;
@@ -284,7 +285,7 @@ int getBinTreeHeight(struct TreeNode* root)
         iLeftHeight = getBinTreeHeight(root->left);
     }
 
-    if (root->left)
+    if (root->right)
     {
         iRightHeight = getBinTreeHeight(root->right);
     }
@@ -438,5 +439,169 @@ struct TreeNode* getNextByPostTravel(struct TreeNode* pstRoot)
     pstParentNode = getBinNodeParent(pstRoot, pstRoot->val);
     if (!pstParentNode) return NULL;
     return getNextByPostTravel(pstParentNode);
+}
+
+#endif
+
+
+/* Here, binary_tree is a tree whose value is no limits. 
+ * example:
+ *
+ *          1
+ *      1       1
+ *    2   2   2   2
+ *   # # # # # # # #
+ */
+#if DESC("binary_tree")
+/*
+ *  Child poionter is null that arr value is SPEC_CHAR.
+ */
+#define SPEC_CHAR 0x7FFFFFFF
+struct TreeNode* ConstructBinaryTree(int aiArr[], int iSize)
+{
+    struct TreeNode *pstNode            = NULL;
+    struct TreeNode *pstLeft            = NULL;
+    struct TreeNode *pstRight           = NULL;
+    struct TreeNode *pstRoot            = NULL;
+    int             i                   = 0;
+    void*           apBinaryTree[iSize];
+    memset(apBinaryTree, 0, sizeof(void*) * iSize);
+
+    for (; i < iSize; i++)
+    {
+        if (0 == i)
+        {
+            /* as root */
+            if (SPEC_CHAR == aiArr[0]) return NULL;
+            pstNode = malloc(sizeof(struct TreeNode));
+            memset(pstNode, 0, sizeof(struct TreeNode));
+            pstNode->val = aiArr[0];
+            pstNode->left = NULL;
+            pstNode->right = NULL;
+            pstRoot = pstNode;
+            apBinaryTree[i] = pstNode;
+        }
+        else
+        {
+            if (SPEC_CHAR == aiArr[i])
+            {
+                continue;
+            }
+            pstNode = (struct TreeNode*)apBinaryTree[i];
+            if (!pstNode) 
+            {
+                /* if aiArr is not empty but no parent then return NULL */
+                printf("elem [%d] has no parent, please check it !\n", i);
+                return NULL;
+            }
+        }
+
+        /* construct child */
+        if (iSize > 2 * (i + 1) - 1)
+        {
+            if (aiArr[2 * i + 1] != 0x7FFFFFFF)
+            {
+                pstLeft = malloc(sizeof(struct TreeNode));
+                memset(pstLeft, 0, sizeof(struct TreeNode));
+                pstLeft->val = aiArr[2 * i + 1];
+                pstNode->left = pstLeft;
+                apBinaryTree[2 * i + 1] = (void*)pstLeft;
+            }
+
+            if ((iSize > 2 * (i + 1) ) && (aiArr[2 * i + 2] != 0x7FFFFFFF))
+            {
+                pstRight = malloc(sizeof(struct TreeNode));
+                memset(pstRight, 0, sizeof(struct TreeNode));
+                pstRight->val = aiArr[2 * i + 2];
+                pstNode->right = pstRight;
+                apBinaryTree[2 * i + 2] = (void*)pstRight;
+            }
+        }
+    }
+    return pstRoot;
+}
+
+int* DeserialBinTree2Arr(struct TreeNode* root, int* piSize)
+{
+    int*                piOut               = NULL;
+    int                 iHeight             = 0;
+    int                 iSize               = 0;
+    int                 i                   = 0;
+    int                 iStart              = 0;
+    struct TreeNode*    pstNode             = NULL;
+    void**              apBinaryTree        = NULL;     /* for save node pos */
+
+    if (!root) return NULL;
+    
+    /* arrsize = 2 ^ iHeight - 1 */
+    iHeight = getBinTreeHeight(root);
+    if (iHeight > 16) return NULL;
+    iSize = (1<<iHeight) - 1;
+
+    piOut = malloc(sizeof(int) * iSize + 1);
+    memset(piOut, 0, iSize * sizeof(int) + 1);
+
+    apBinaryTree = malloc(iSize * sizeof(void*) + 1);
+    memset(apBinaryTree, 0, sizeof(void*) * iSize + 1);
+
+    piOut[0] = root->val;
+    apBinaryTree[0] = root;
+
+    for (i = 0; i < iSize; i++)
+    {
+        if (piOut[i] != SPEC_CHAR)
+        {
+            pstNode = apBinaryTree[i];
+            if (!pstNode) 
+            {
+                goto error;
+            }
+            /* set val in arr by index */
+            if (i * 2 + 1 < iSize)
+            {
+                if (pstNode->left)
+                {
+                    piOut[i * 2 + 1] = pstNode->left->val;
+                    apBinaryTree[i * 2 + 1] = pstNode->left;
+                }
+                else
+                {
+                    piOut[i * 2 + 1] = SPEC_CHAR;
+                }
+            }
+
+            if (i * 2 + 2 < iSize)
+            {
+                if (pstNode->right)
+                {
+                    piOut[i * 2 + 2] = pstNode->right->val;
+                    apBinaryTree[i * 2 + 2] = pstNode->right;
+                }
+                else
+                {
+                    piOut[i * 2 + 2] = SPEC_CHAR;
+                }
+            }
+        }
+        else
+        {
+            /* set left and right */
+            if ((i * 2 + 1) < iSize)    piOut[i * 2 + 1] = SPEC_CHAR;
+            if ((i * 2 + 2) < iSize)    piOut[i * 2 + 2] = SPEC_CHAR;
+        }
+    }
+    
+    *piSize = iSize;
+    free(apBinaryTree);
+    apBinaryTree = NULL;
+    return piOut;
+    
+error:
+    free(piOut); 
+    piOut = NULL;
+    free(apBinaryTree);
+    apBinaryTree = NULL;
+    *piSize = 0;
+    return NULL;    
 }
 #endif

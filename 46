@@ -1,0 +1,298 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <assert.h>
+#include <stdint.h>
+#include <math.h>
+
+#include "leetcode.h"
+
+#define bool int
+/*
+ * leetcode 52:
+ * Level    : easy
+ * 107. Binary Tree Level Order Traversal II
+ *
+ */
+int** levelOrderBottom(struct TreeNode* root, int** columnSizes, int* returnSize) {
+    int                 iSize                   = 0;
+    int                 iHeight                 = 0;
+    int                 i                       = 0;
+    int                 j                       = 0;
+    int                 k                       = 0;
+    int                 l                       = 0;
+    int*                piBinary                = NULL;
+    int**               ppiOut                  = NULL;
+    int*                piOutSize               = NULL;
+
+
+    iHeight = getBinTreeHeight(root);
+    ppiOut = malloc(sizeof(int*) * iHeight + 1);
+    memset(ppiOut, 0, sizeof(int*) * iHeight + 1);
+
+    piOutSize = malloc(sizeof(int) * iHeight + 1);
+    memset(piOutSize, 0, sizeof(int) * iHeight + 1);
+
+    piBinary = DeserialBinTree2Arr(root, &iSize);
+
+    for (i = iHeight, k = i; i > 0; i--, l = 0)
+    {
+        ppiOut[k - i] = malloc(sizeof(int) * pow(2, i - 1));
+        memset(ppiOut[k - i], 0, sizeof(int) * pow(2, i - 1));
+        for (j = pow(2, i - 1) - 1; j < pow(2, i) - 1; j++)
+        {
+            if (piBinary[j] != SPEC_CHAR)
+            {
+                ppiOut[k - i][l++] = piBinary[j];
+                piOutSize[k - i]++;
+            }
+        }
+    }
+
+    *columnSizes = piOutSize;
+    *returnSize = iHeight;
+
+    free(piBinary);
+    piBinary = NULL;
+
+    return ppiOut;
+}
+
+
+/*
+ * leetcode 51:
+ * Level    : easy
+ * 101. Symmetric Tree
+ *
+ */
+bool isSymmetric_re(struct TreeNode* r1, struct TreeNode* r2) {
+    if (!r1 && !r2) return true;
+    if (!r1 || !r2) return false;
+    
+    if (r1->val != r2->val) return false;
+
+    return isSymmetric_re(r1->left, r2->right) && isSymmetric_re(r1->right, r2->left);
+    
+
+}    
+bool isSymmetric(struct TreeNode* root) {
+    if (!root) return true;
+
+    return isSymmetric_re(root->left, root->right); 
+}
+
+/*
+ * leetcode 50:
+ * Level    : easy
+ * 100. Same Tree
+ * use recursive 
+ */
+bool isSameTree(struct TreeNode* p, struct TreeNode* q) {
+    if (!p && !q) return true;
+    if ((p && !q) || (!p && q)) return false;
+
+    /* both not empty */
+    if (p->val != q->val) return false;
+
+    if (!isSameTree(p->left, q->left)) return false;
+    if (!isSameTree(p->right, q->right)) return false;
+
+    return true;
+}
+bool isSameTree1(struct TreeNode* p, struct TreeNode* q) {
+    int*                piP                     = NULL;
+    int*                piQ                     = NULL;
+    int                 iPSize                  = 0;
+    int                 iQSize                  = 0;
+    int                 i                       = 0;
+    int                 j                       = 0;
+    int                 iRet                    = 1;
+
+    piP = deserialBinTree(p, &iPSize);
+    piQ = deserialBinTree(q, &iQSize);
+    
+
+    for (i = iPSize, j = iQSize; (i == j) && (i >= 0); i--, j--)
+    {
+        if (piP[i] != piQ[j])
+        {
+            iRet = 0;
+            goto error;
+        }
+    }
+
+    if (i != j) 
+    {
+        iRet = 0;
+    }
+
+error:
+    free (piP);
+    free (piQ);
+    return iRet;
+}
+
+
+/*
+ * leetcode 49:
+ * Level    : easy
+ * 88. Merge Sorted Array
+ *
+ */
+void merge(int* nums1, int m, int* nums2, int n) {
+    int                 i                        = 0;
+    int                 j                        = 0;
+    
+    for (i = m, j = 0; j < n; j++, i++)
+    {
+        nums1[i] = nums2[j];
+    } 
+
+    qsort(nums1, m + n, sizeof(int), cmpn);
+
+    return;
+}
+
+/*
+ * leetcode 48:
+ * Level    : easy
+ * 83. Remove Duplicates from Sorted List
+ *
+ */
+struct ListNode* deleteDuplicates(struct ListNode* head) {
+    struct ListNode*     pstList                = NULL;
+    struct ListNode*     pstNext                = NULL;
+
+    if (!head) return NULL;
+
+    pstList = head;
+    pstNext = pstList->next;
+
+    while (pstNext)
+    {
+        if (pstList->val == pstNext->val)
+        {
+            pstList->next = pstNext->next;
+            pstNext = pstNext->next;
+            /* TODO: free pstNext */
+            continue;
+        }
+        pstList = pstNext;
+        pstNext = pstNext->next;
+    }
+
+    return head;
+}
+
+/*
+ * leetcode 47:
+ * Level    : easy
+ * 69. Sqrt(x)
+ *
+ */
+int mySqrt(int x) {
+    int                 i                       = 1;
+
+    if (x <= 0) return 0;    
+    if (x >= 2147395600) return 46340;
+
+    while (i * i <= x) i++;
+
+    return (i-1);
+}
+
+/*
+ * leetcode 46:
+ * Level    : easy
+ * 67. Add Binary
+ *
+ */
+char* addBinary(char* a, char* b) {
+    int                 iLen                    = 0;
+    int                 i                       = 0;
+    int                 iCarry                  = 0;
+    int                 j                       = 0;
+    char*               pcOut                   = NULL;
+
+    iLen = MAX_INT(strlen(a), strlen(b));
+    pcOut = malloc(sizeof(char) * (iLen + 1 + 1));
+    memset(pcOut, 0, iLen + 2);
+
+    for (i = strlen(a) - 1, j = strlen(b) - 1; (i >= 0) && (j >= 0); i--, j--, iLen--)
+    {
+        if(a[i] == b[j])
+        {
+            pcOut[iLen - 1] = (iCarry ? '1' : '0');
+            iCarry = ((a[i] == '1') ? 1 : 0);
+        }
+        else
+        {
+            pcOut[iLen - 1] = (iCarry ? '0' : '1');
+        }
+    }
+
+    /* pro left */
+    while (i >= 0)
+    {
+        pcOut[i] = ((a[i] == '1') ? (iCarry ? ' 0' : '1') : (iCarry ? '1' : '0'));
+        iCarry = ((a[i] == '0') ? 0 : iCarry); 
+        i--;
+    }
+
+    while (j >= 0)
+    {
+        pcOut[j] = ((b[j] == '1') ? (iCarry ? ' 0' : '1') : (iCarry ? '1' : '0'));
+        iCarry = ((b[j] == '0') ? 0 : iCarry); 
+        j--;
+    }
+
+    if (iCarry)
+    {
+        iLen = MAX_INT(strlen(a), strlen(b));
+        //strncpy(&pcOut[1], &pcOut[0], iLen);
+        while (iLen > 0)
+        {
+            pcOut[iLen] = pcOut[iLen - 1];
+            iLen--;
+        }
+
+        pcOut[0] = '1';
+    }
+    
+    /* TODO: free pcOut */
+    return pcOut;
+}
+
+int main()
+{
+    int             iRet                = 0;
+    struct TreeNode *pstRoot1           = NULL;
+    //int             aiArr1[]            = {3, 9, 20, SPEC_CHAR, SPEC_CHAR, 15, 7};
+    int             aiArr1[]            = {69,73,68,18,20,18,39,7,-3,13,-1,42,5,93,70,63,17,0x7fffffff,91,-4,30,0x7fffffff,-1,64,-4,16,49,48,78,51,43,92,45,0x7fffffff,53,9,36,80,-6,58,78,0x7fffffff,0x7fffffff,41,81,89,67,71,0x7fffffff,25,0x7fffffff,82,54,28,14,61,57,35,5,83,9,18,0x7fffffff,-9,-9,50,92,93,0x7fffffff,0,80,62,1,28,29,27,89,21,0x7fffffff,85,-9,0x7fffffff,56,56,-9,0x7fffffff,0x7fffffff,43,0x7fffffff,29,97,-7,0x7fffffff,35,25,90,67,53,18,61,7,23,81,37,19,26,2,0,19,0x7fffffff,0x7fffffff,77,37,-2,0x7fffffff,49,39,28,1,37,11,87,83,68,55,53,33,-2,22,7,52,0x7fffffff,14,0x7fffffff,18,50,97,-8,-7,0x7fffffff,21,59,72,27,0x7fffffff,64,0x7fffffff,0x7fffffff,47,0x7fffffff,0x7fffffff,38,46,0x7fffffff,0x7fffffff,99,0x7fffffff,0x7fffffff,48,13,85,78,7,64,43,59,71,11,37,12,37,50,2,0x7fffffff,0x7fffffff,89,87,0x7fffffff,78,97,0x7fffffff,31,86,37,96,34,38,6,36,0x7fffffff,0x7fffffff,99,63,0x7fffffff,12,0x7fffffff,82,0x7fffffff,81,70,19,0x7fffffff,81,32,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,79,10,0x7fffffff,91,48,-3,94,65,0x7fffffff,20,26,96,21,92,91,0x7fffffff,89,9,74,0x7fffffff,0x7fffffff,96,0x7fffffff,64,67,50,96,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,40,78,0x7fffffff,27,3,17,0x7fffffff,0x7fffffff,2,45,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,13,0x7fffffff,0x7fffffff,17,45,69,30,0x7fffffff,0x7fffffff,43,0x7fffffff,4,13,-6,66,6,0x7fffffff,16,48,55,98,69,57,0x7fffffff,5,9,65,-9,55,2,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,68,0x7fffffff,0x7fffffff,0x7fffffff,5,61,51,0x7fffffff,0x7fffffff,32,43,0x7fffffff,35,20,0x7fffffff,-7,38,30,1,80,0x7fffffff,0x7fffffff,42,86,42,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,47,0x7fffffff,0x7fffffff,0x7fffffff,62,29,-9,83,60,71,48,0x7fffffff,24,0x7fffffff,76,6,65,18,95,29,11,0x7fffffff,38,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,21,3,6,23,36,0x7fffffff,45,0x7fffffff,34,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,41,0x7fffffff,57,13,18,92,43,83,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,2,-4,97,0x7fffffff,93,0x7fffffff,62,0x7fffffff,0x7fffffff,48,18,71,92,53,89,0x7fffffff,0x7fffffff,0x7fffffff,95,0x7fffffff,16,0x7fffffff,0x7fffffff,0x7fffffff,83,87,5,0x7fffffff,0x7fffffff,3,-8,-4,65,0x7fffffff,0x7fffffff,0x7fffffff,22,0x7fffffff,31,0x7fffffff,0x7fffffff,0x7fffffff,63,0x7fffffff,0x7fffffff,62,0x7fffffff,57,12,85,45,23,55,0x7fffffff,0x7fffffff,0x7fffffff,81,83,23,0x7fffffff,3,0x7fffffff,83,0x7fffffff,-4,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,64,0x7fffffff,15,50,57,0x7fffffff,0x7fffffff,0x7fffffff,4,0x7fffffff,0x7fffffff,0x7fffffff,29,0x7fffffff,0x7fffffff,87,0x7fffffff,22,92,0x7fffffff,0x7fffffff,67,90,0x7fffffff,93,47,46,0x7fffffff,0x7fffffff,0x7fffffff,28,72,18,59,25,3,74,0x7fffffff,0x7fffffff,0x7fffffff,-5,28,-1,61,15,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,79,0x7fffffff,16,0x7fffffff,0x7fffffff,59,47,-7,98,31,50,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,19,0x7fffffff,93,0x7fffffff,22,0x7fffffff,0x7fffffff,-5,40,0x7fffffff,0x7fffffff,0x7fffffff,75,30,0x7fffffff,7,53,76,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,68,19,0x7fffffff,63,41,91,0x7fffffff,43,0x7fffffff,49,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,46,0x7fffffff,0x7fffffff,87,74,49,1,21,62,6,34,77,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,-9,61,0x7fffffff,0x7fffffff,0x7fffffff,7,0x7fffffff,45,0x7fffffff,0x7fffffff,63,0x7fffffff,0x7fffffff,7,0x7fffffff,0x7fffffff,16,86,0x7fffffff,0x7fffffff,63,0x7fffffff,61,72,0x7fffffff,13,0x7fffffff,24,91,0x7fffffff,0x7fffffff,59,0x7fffffff,0x7fffffff,48,14,77,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,92,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,84,0x7fffffff,0x7fffffff,76,82,63,84,84,94,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,47,40,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,75,20,0x7fffffff,0x7fffffff,0x7fffffff,-9,0x7fffffff,0x7fffffff,24,74,0x7fffffff,51,0x7fffffff,0x7fffffff,91,0x7fffffff,83,17,0x7fffffff,0x7fffffff,0x7fffffff,42,49,88,57,85,1,0x7fffffff,94,0x7fffffff,28,36,78,0x7fffffff,53,0x7fffffff,27,25,46,97,58,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,12,33,0x7fffffff,0x7fffffff,6,0x7fffffff,0x7fffffff,0x7fffffff,87,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,9,0x7fffffff,83,0x7fffffff,0x7fffffff,0x7fffffff,90,11,0x7fffffff,61,0x7fffffff,89,0x7fffffff,46,0x7fffffff,86,81,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,53,0x7fffffff,0x7fffffff,59,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,29,0x7fffffff,47,97,0,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,9,0x7fffffff,17,0x7fffffff,91,45,9,61,21,0x7fffffff,0x7fffffff,64,0x7fffffff,69,0x7fffffff,44,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,12,0x7fffffff,2,-8,88,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,-8,0x7fffffff,93,0x7fffffff,0x7fffffff,0x7fffffff,86,0x7fffffff,0x7fffffff,97,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,72,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,50,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,47,70,0x7fffffff,62,0x7fffffff,-3,-5,59,15,0x7fffffff,-3,37,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,20,-2,0x7fffffff,8,90,0x7fffffff,0x7fffffff,0x7fffffff,61,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,15,12,95,0x7fffffff,0x7fffffff,73,11,76,76,49,0x7fffffff,0x7fffffff,51,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,42,0x7fffffff,0x7fffffff,-9,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,80,0x7fffffff,0x7fffffff,70,31,78,98,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,7,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,57,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,-3,0x7fffffff,0x7fffffff,-7,0x7fffffff,31,42,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,62,17,7,0x7fffffff,0x7fffffff,63,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,83,51,0x7fffffff,76,77,0x7fffffff,0x7fffffff,40,0x7fffffff,0x7fffffff,95,0x7fffffff,27,55,61,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,95,0x7fffffff,93,19,0x7fffffff,37,0x7fffffff,73,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,75,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,22,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,-7,99,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,94,63,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,39,77,0x7fffffff,-2,15,0x7fffffff,69,33,9,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,42,0x7fffffff,0x7fffffff,0x7fffffff,69,35,0x7fffffff,36,0x7fffffff,11,0x7fffffff,0x7fffffff,0x7fffffff,52,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,51,50,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,30,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,63,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,0x7fffffff,56,28};
+
+
+    int**           ppiOut              = NULL;
+    int*            piCol               = NULL;
+    int             iRetSize            = 0;
+ 
+    pstRoot1 = ConstructBinaryTree(aiArr1, sizeof(aiArr1) / sizeof(int));
+
+    ppiOut = levelOrderBottom(pstRoot1, &piCol, &iRetSize);
+    
+    printf("%d.\n", iRetSize);
+    
+#if 0
+    int                     aiArr1[]            = {1,2,3,0,0,0};
+    int                     aiArr2[]            = {2, 5, 6};
+
+    merge(aiArr1, 3,  aiArr2, 3);
+    char*                   pcA                 = "101111";
+    char*                   pcB                 = "10";
+    char*                   pcOut               = NULL;
+
+    pcOut = addBinary(pcA, pcB);
+
+    printf("%s.\n", pcOut);
+#endif
+    return 0;
+}
