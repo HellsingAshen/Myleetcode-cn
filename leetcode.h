@@ -1,7 +1,9 @@
 #define DESC(str) 		1
 
 #define MAX_INT(a, b) 	((a > b) ? a : b)
+#define MIN_INT(a, b) 	((a < b) ? a : b)
 #define FREE(p) if (p) { free(p); p = NULL;}
+#define bool int
 
 struct ListNode {
     int val;
@@ -307,7 +309,6 @@ int* deserialBinTree(struct TreeNode* root, int* piSize)
     int                 iHeight             = 0;
     int                 iSize               = 0;
     int                 i                   = 0;
-    int                 iStart              = 0;
     struct TreeNode*    pstNode             = NULL;
     
     /* arrsize = 2 ^ iHeight - 1 */
@@ -527,7 +528,6 @@ int* DeserialBinTree2Arr(struct TreeNode* root, int* piSize)
     int                 iHeight             = 0;
     int                 iSize               = 0;
     int                 i                   = 0;
-    int                 iStart              = 0;
     struct TreeNode*    pstNode             = NULL;
     void**              apBinaryTree        = NULL;     /* for save node pos */
 
