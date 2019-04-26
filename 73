@@ -1,0 +1,438 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <assert.h>
+#include <stdint.h>
+#include <math.h>
+
+#include "leetcode.h"
+/*
+ *  leetcode 86:
+ *  Level    : easy
+ *  400. Nth Digit
+ *
+ */
+int findNthDigit(int n){
+    int                 i                   = 0;
+    unsigned long long  iPos                = 0;
+    unsigned long long  iPre                = 0;
+    unsigned long long  iBase               = 0;
+    int                 iLeft               = 0;
+    if (n < 10) return n;
+    for (; iPos < n; i++)
+    {
+        iPre = iPos;
+        iPos += 9 * pow(10, i) * (i + 1);
+    }
+    /* get the number */
+    iBase = pow(10, i - 1) - 1;
+    
+    iPos = iBase + (n - iPre) / i;
+    iPos = (((n - iPre) % i != 0) ? (iPos + 1) : iPos);
+    
+    iLeft = ((n - iPre) % i);
+
+    return ((0 == iLeft) ? (iPos % 10) : ((int)(iPos / pow(10, i - iLeft)) % 10));
+}
+/*
+ *  leetcode 85:
+ *  Level    : easy
+ *  389. Find the Difference
+ *
+ */
+char findTheDifference(char * s, char * t){
+    int                 i                   = 0;
+    qsort(s, strlen(s), sizeof(char), cmpc);
+    qsort(t, strlen(t), sizeof(char), cmpc);
+
+    for (; i < strlen(s); i++)
+    {
+        if (s[i] != t[i]) return t[i];
+    }
+
+    return t[strlen(s)];
+}
+
+/*
+ *  leetcode 84:
+ *  Level    : easy
+ *  367. Valid Perfect Square
+ *
+ */
+bool isPerfectSquare(int num){
+    int                 i                   = 1;
+    
+    if (num < 0) return false;
+    if (0 ==num) return true;
+    while (1)
+    {
+        if ((i == num / i) && (0 == num % i)) return true;
+        if (i >= num / i) return false;
+        i++;
+    }
+    return false;
+}
+/*
+ *  leetcode 83:
+ *  Level    : easy
+ *  371. Sum of Two Integers
+ *
+ */
+int getSum(int a, int b){
+    int                 iSum                = 0;
+    int                 iCarry              = 0;
+    iSum = a ^ b;
+    iCarry = (unsigned int)((a & b) << 1);
+
+    return ((0 == iCarry) ? iSum : getSum(iSum, iCarry));
+
+}
+
+/*
+ *  leetcode 82:
+ *  Level    : easy
+ *  342. Power of Four
+ *
+ */
+bool isPowerOfFour(int num){
+    if (num <= 0) return false;
+    while (0 == num % 4)  num = num / 4;
+    return ((1 == num) ? true : false);
+}
+
+/*
+ * leetcode 81:
+ * Level    : easy
+ * 263. Ugly Number
+ *
+ */
+bool isUgly(int num){
+    if (0 == num) return false;
+    while (0 == num % 2)  num = num / 2;
+    while (0 == num % 3)  num = num / 3;
+    while (0 == num % 5)  num = num / 5;
+    return ((1 == num) ? true : false);
+}
+/*
+ * leetcode 80:
+ * Level    : easy
+ * 258. Add Digits
+ *
+ */
+int addDigits(int num){
+    if (num < 10) return num;
+    return addDigits(num / 10 + num % 10);
+}
+
+/*
+ * leetcode 78:
+ * Level    : easy
+ * 231. Power of Two
+ * dp 
+ */
+bool isPowerOfTwo(int n){
+    long long           iMid                = 1;
+
+    if (n < 0) return false;
+    for (; iMid <= n;)
+    {
+        if (iMid == n) return true;
+        iMid = iMid << 1;
+    }
+    return false;
+}
+/*
+ * leetcode 78:
+ * Level    : easy
+ * 219. Contains Duplicate II
+ * 
+ */
+bool containsNearbyDuplicate(int* nums, int numsSize, int k){
+    int                 i                   = 0;
+    int                 j                   = 0;
+
+    for (; i < numsSize - 1; i++)
+    {
+        for (j = i + 1; j < numsSize; j++)
+        {
+            if (nums[i] == nums[j])
+            {
+                if (j - i <= k) return true;
+                break;
+            }
+        }
+    } 
+    return false;
+}
+
+/*
+ * leetcode 77:
+ * Level    : easy
+ * 217. Contains Duplicate
+ * 
+ */
+bool containsDuplicate(int* nums, int numsSize){
+    int                 i                   = 0;
+    qsort(nums, numsSize, sizeof(int), cmpn);
+    for (; i < numsSize - 1; i++)
+    {
+        if (nums[i] == nums[i + 1]) return true;
+        
+    }
+    return false;
+
+}
+
+/*
+ * leetcode 76:
+ * Level    : easy
+ * 205. Isomorphic Strings
+ * 
+ */
+bool isIsomorphic(char* s, char* t) {
+    int                 i                   = 0;
+    char                 aiMap[128]          = {0}; /* asc code */
+    char                 aiMap1[128]          = {0}; /* mul to 1 */
+
+    while (s[i])
+    {
+        if (0 == aiMap[s[i]] && 0 == aiMap1[t[i]])
+        {
+            aiMap[s[i]] = t[i];
+            aiMap1[t[i]] = s[i];
+        }
+        else if ((aiMap[s[i]] != t[i]) || (aiMap1[t[i]] != s[i]))
+        {
+            return false;
+        }
+        i++;       
+    }
+    return true;
+}
+/*
+bool isIsomorphic(char* s, char* t) {
+    int                 i                   = 0;
+    int                 j                   = 0;
+    int                 k                   = 0;
+    int                 aiMap[128]          = {0}; 
+    int                 aiMap1[128]          = {0};
+    int*                piStr               = NULL;
+    char                pcDupt[strlen(t) + 1];
+
+    if (strlen(s) != strlen(t)) return false;
+
+    piStr = malloc(strlen(t) * sizeof(int));
+    memset(piStr, 0, strlen(t) * sizeof(int));
+    for (; i < strlen(t); i++) piStr[i] = 0;
+
+    memset(pcDupt, 0, strlen(t) + 1);
+    strcpy(pcDupt, t);
+    for (i = 0; i < strlen(s); i++)
+    {
+        if (!aiMap[s[i]])
+        {
+            aiMap[s[i]] = 1;
+            if (!aiMap1[t[i]]) 
+            {
+                aiMap1[t[i]] = 1;
+                for (j = i + 1; j < strlen(t); j++)
+                {
+                    if (0 == piStr[j])
+                    {
+                        if (t[j] == t[i]) 
+                        {
+                            if (s[j] != s[i]) return false;
+                            t[j] = s[i];
+                            piStr[j] = 1;
+                        }
+                    }
+                }
+                t[i] = s[i];
+            }
+        }
+        else
+        {
+            for (k = 0; k < i; k++)
+            {
+                if (s[k] == s[i])
+                {
+                    if (pcDupt[k] != pcDupt[i]) return false;
+                    break;
+                }
+            }
+        }
+    }
+    free(piStr);
+    piStr = NULL;
+
+    return ((!strcmp(s, t)) ? true : false);
+}
+*/
+/*
+ * leetcode 75:
+ * Level    : easy
+ * 204. Count Primes
+ * 
+ */
+int countPrimes(int n) {
+    int*            piPrimes                = NULL;
+    int             i                       = 0;
+    int             j                       = 0;
+    int             iCount                  = 0;
+
+    if (n <= 2) return 0;
+
+    piPrimes = malloc(sizeof(int) * n);
+    memset(piPrimes, 0, sizeof(int) * n);
+
+    for (i = 2; i < n; i++) 
+    {
+        piPrimes[i] = 1;
+    }
+
+    for (i = 2; i < n; i++) 
+    {
+        if (piPrimes[i])
+        {
+            iCount++;
+            for (j = 2; j * i < n; j++)
+            {
+                piPrimes[i * j] = 0;
+            }
+        }
+    }
+    
+    free(piPrimes);
+    piPrimes = NULL;
+    return iCount;
+}
+int countPrimes1(int n) {
+    int*            piPrimes                = NULL;
+    int             i                       = 0;
+    int             j                       = 0;
+    int             iCount                  = 0;
+    if (n <= 2) return 0;
+    if (n <= 3) return 1; /* 2 */
+    if (n <= 5) return 2;  /* 2, 3 */
+    if (n <= 7) return 3;  /* 2, 3, 5 */
+    if (n <= 11) return 4;  /* 2, 3, 5, 7*/
+
+    piPrimes = malloc(sizeof(int) * (n / 2));
+    memset(piPrimes, 0, sizeof(int) * (n / 2));
+
+    for (i = 11; i < n; i = i + 2)
+    {
+        if ((0 == i % 3) || (0 == i % 5) || (0 == i % 7)) continue;
+        for (j = 0; j < iCount / 11; j++)
+        {
+            if (0 == i % piPrimes[j]) break;
+        }
+
+        if (j == iCount / 11)
+        {
+            /* get a prime and add it into arr */
+            piPrimes[iCount++] = i;
+        }
+    }
+
+    free(piPrimes);
+    piPrimes = NULL;
+
+    return (iCount + 4);
+}
+/*
+ * leetcode 74:
+ * Level    : easy
+ * 203. Remove Linked List Elements
+ * 
+ */
+struct ListNode* removeElements(struct ListNode* head, int val) {
+    struct ListNode* pstNode                = NULL;
+    struct ListNode* pstNext                = NULL;
+    struct ListNode* pstOut                 = NULL;
+    
+    pstNode = head;
+
+    while (pstNode && (val == pstNode->val)) pstNode = pstNode->next;
+
+    if (!pstNode) return NULL;
+    
+    pstOut = pstNode;
+    pstNext = pstNode->next;
+    while (pstNext)
+    {
+        if (val == pstNext->val)
+        {
+            pstNode->next = pstNext->next;
+        }
+        else
+        {
+            pstNode = pstNext;
+        }
+
+        pstNext = pstNext->next;
+    }
+    
+    return pstOut;
+    
+}
+
+/*
+ * leetcode 73:
+ * Level    : easy
+ * 202. Happy Number
+ *  4 ¡ú 16 ¡ú 37 ¡ú 58 ¡ú 89 ¡ú 145 ¡ú 42 ¡ú 20 ¡ú 4
+ */
+
+int getSum1(int m)
+{
+    int                 i                   = 0;
+    int                 j                   = 0;
+    i = m;
+    while (i)
+    {
+        j += (i % 10) * (i % 10);
+        i = i / 10;
+    }
+    return j;
+}
+bool isHappy(int n) {
+    int                 i                   = 0;
+    i = n;
+    while (i)
+    {
+        i = getSum1(i);
+        if (1 == i) return true;
+        if (4 == i) return false;
+    }
+    return true;
+}
+
+int main()
+{
+    int                 iRet                    = 0;
+    int                 aiArr[]                 = {10,1,10};
+    iRet = findNthDigit(1000000000);
+    //iRet = findNthDigit(1000);
+    //iRet = findNthDigit(1000);
+    //iRet = findNthDigit(1000);
+    
+
+    printf("iRet = [%d].\n", iRet);
+#if 0
+    iRet = isPerfectSquare(16);
+    //iRet = containsNearbyDuplicate(aiArr, sizeof(aiArr) / sizeof(int), 5);
+    //int                 aiArr[]                 = {2,7,9,3,1};
+    //char                a[10]                   = "baa";
+    //char                b[10]                   = "aba";
+    //char                a[10]                   = "egg";
+    //char                b[10]                   = "add";
+    //char                a[10]                   = "baa";
+    //char                b[10]                   = "cfa";
+    char                a[10]                   = "bar";
+    char                b[10]                   = "foo";
+    iRet = isIsomorphic(a, b);
+    printf("iRet = [%d].\n", iRet);
+#endif
+    return iRet;
+}
