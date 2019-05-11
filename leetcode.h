@@ -59,7 +59,7 @@ static int cmpstrlen(const void *p1, const void *p2)
 }
 static int cmpn(const void *p1, const void *p2)
 {
-    return (*(int*)p1 - *(int*)p2);
+    return ((*(int*)p1 == *(int*)p2) ? 0 : ((*(int*)p1 > *(int*)p2) ? 1 : -1));
 }
 
 static int cmpc(const void *p, const void *q)
@@ -379,6 +379,47 @@ struct TreeNode* getBinNodeParent(struct TreeNode* root, int iVal)
     }
     return pstNode;
 }
+
+int getNodeHeight(struct TreeNode* root, struct TreeNode* node)
+{
+    int                 iHeight             = -1;
+    assert(NULL != node);
+    if (node == root) return 0;
+    if (root->left)
+    {
+        iHeight = getNodeHeight(root->left, node);
+        if (0 <= iHeight) return (iHeight + 1);
+    }
+
+    if (root->right)
+    {
+        iHeight = getNodeHeight(root->right, node);
+        if (0 <= iHeight) return (iHeight + 1);
+    }
+
+    return -1;
+}
+struct TreeNode* getNodeParent(struct TreeNode* root, struct TreeNode* node)
+{
+    struct TreeNode*    pstParent           = NULL;
+    if (node == root) return NULL;
+
+    if (root->left)
+    {
+        if (root->left == node) return root;
+        pstParent = getNodeParent(root->left, node);
+        if (pstParent) return pstParent;
+    }
+    
+    if (root->right)
+    {
+        if (root->right == node) return root;
+        pstParent = getNodeParent(root->right, node);
+        if (pstParent) return pstParent;
+    }
+    return NULL;
+}
+
 int getBinNodeHeight(struct TreeNode* root, int iVal)
 {
     struct TreeNode*    pstNode             = NULL;

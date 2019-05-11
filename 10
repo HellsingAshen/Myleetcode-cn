@@ -230,7 +230,8 @@ int findMaxConsecutiveOnes(int* nums, int numsSize) {
 int main(int argc, char* argv[])
 {
     struct TreeNode *pstRoot            = NULL;
-    int             aiArr[]             = {1, 0x7fffffff, 1, 0x7fffffff, 0x7fffffff, 1, 1};
+    //int             aiArr[]             = {1, 0x7fffffff, 1, 0x7fffffff, 0x7fffffff, 1, 1};
+    int             aiArr[]             = {1, 0x7fffffff, 2, 0x7fffffff, 0x7fffffff, 3, 3};
     int             iRet                = 0;
     int*            piOut               = NULL;
     int             iSize               = 0;

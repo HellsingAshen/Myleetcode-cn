@@ -1,0 +1,1070 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <assert.h>
+#include <stdint.h>
+#include <math.h>
+
+#include "leetcode.h"
+
+/*
+ *  leetcode 109:
+ *  Level    : easy
+ *  476. Number Complement
+ *
+ */
+int findComplement(int num){
+    int                 i                   = 0;
+    int                 j                   = 0;
+    i = num;
+    while (i > 0)
+    {
+        i = i / 2;
+        j++;
+    }
+    
+    i = pow(2, j) - 1;
+    
+    return (~num & i);
+}
+
+/*
+ *  leetcode 108:
+ *  Level    : easy
+ *  448. Find All Numbers Disappeared in an Array
+ *
+ */
+int* findDisappearedNumbers(int* nums, int numsSize, int* returnSize){
+
+    int                 i                   = 0;
+    int                 j                   = 0;
+    int                 iNext               = 0;
+    int                *piOut               = NULL;
+
+    piOut = malloc(sizeof(int) * numsSize);
+    for (; i < numsSize; i++)
+    {
+        piOut[i] = 0;
+        if (nums[i] > 0)
+        {
+            iNext = nums[i] - 1;
+            while (nums[iNext] > 0)
+            {
+                j = nums[iNext] - 1;
+                nums[iNext] = -1 * nums[iNext];
+                iNext = j;
+            }
+        }
+    }
+
+
+    for (i = 0, j = 0; i < numsSize; i++)
+    {
+        if (nums[i] > 0) piOut[j++] = i + 1;
+    }
+
+    *returnSize = j;
+    return piOut;
+}
+
+/*
+ *  leetcode 107:
+ *  Level    : easy
+ *  434. Number of Segments in a String
+ *
+ */
+int countSegments(char * s){
+    int                 i                   = 0;
+    int                 iCount              = 1;
+    char*               pcPos               = NULL;
+    char*               pcRev               = malloc(strlen(s) + 1);
+    char*               pcRev1              = pcRev;
+    strcpy(pcRev, s);
+
+    while (' ' == pcRev[i++]);
+    pcRev = pcRev + i - 1;
+    if (NULL == s || 0 == strlen(pcRev)){ free(pcRev1); return 0;}
+
+    while (' ' == pcRev[strlen(pcRev) - 1])
+    {
+        pcRev[strlen(pcRev) - 1] = '\0';
+    }
+
+    for (pcPos = strstr(pcRev, " "), i = 0; pcPos; i = 0)
+    {
+        pcPos++;
+        iCount++;
+        while (pcPos && ' ' == pcPos[i++]);
+        if (pcPos) pcPos = pcPos + i - 1;
+        pcPos = strstr(pcPos, " ");
+    }
+    free(pcRev1);
+    return iCount;
+}
+/*
+ *  leetcode 106:
+ *  Level    : easy
+ *  232. Implement Queue using Stacks
+ *
+ */
+#define DFT_STK_SIZE 1024
+#define EMPTY_STK_VALUE -2147483648
+typedef struct {
+    int     iSize;              /* cur stack size */
+    int*    piEle;              /* Element */
+    int     iTop;               /* Top pos */
+} MyStack;
+
+MyStack* myStackCreate();
+void myStackPush(MyStack* obj, int x);
+int myStackPop(MyStack* obj); 
+int myStackTop(MyStack* obj); 
+bool myStackEmpty(MyStack* obj); 
+void myStackFree(MyStack* obj);
+
+typedef struct {
+    MyStack*    pstStk;
+} MyQueue;
+
+/** Initialize your data structure here. */
+
+MyQueue* myQueueCreate() {
+    MyQueue*                pstQue              = NULL;
+    
+    pstQue = malloc(sizeof(MyQueue));
+    memset(pstQue, 0, sizeof(MyQueue));
+    pstQue->pstStk = myStackCreate();
+    
+    return pstQue;
+}
+
+/** Push element x to the back of queue. */
+void myQueuePush(MyQueue* obj, int x) {
+    assert(NULL != obj);
+    myStackPush(obj->pstStk, x);
+    return;
+}
+
+/** Removes the element from in front of queue and returns that element. */
+int myQueuePop(MyQueue* obj) {
+    MyStack*                pstStk              = NULL;
+    int                     iEle                = 0;
+    int                     iRet                = 0;
+
+    pstStk = myStackCreate();
+    assert(NULL != pstStk);
+
+    while (!myStackEmpty(obj->pstStk))
+    {
+        iEle = myStackPop(obj->pstStk);
+        myStackPush(pstStk, iEle);
+    }
+
+    iRet = myStackPop(pstStk); 
+
+    /* create new stk */
+    while (!myStackEmpty(pstStk))
+    {
+        iEle = myStackPop(pstStk);
+        myStackPush(obj->pstStk, iEle);
+    }
+
+    myStackFree(pstStk);
+
+    return iRet;
+}
+
+/** Get the front element. */
+int myQueuePeek(MyQueue* obj) {
+    MyStack*                pstStk              = NULL;
+    int                     iEle                = 0;
+    int                     iRet                = 0;
+
+    pstStk = myStackCreate();
+
+    while (!myStackEmpty(obj->pstStk))
+    {
+        iEle = myStackPop(obj->pstStk);
+        myStackPush(pstStk, iEle);
+    }
+
+    iRet = myStackTop(pstStk);
+
+    /* create new stk */
+    while (!myStackEmpty(pstStk))
+    {
+        iEle = myStackPop(pstStk);
+        myStackPush(obj->pstStk, iEle);
+    }
+
+    myStackFree(pstStk);
+
+    return iRet;
+}
+
+/** Returns whether the queue is empty. */
+bool myQueueEmpty(MyQueue* obj) {
+    return myStackEmpty(obj->pstStk);
+  
+}
+
+void myQueueFree(MyQueue* obj) {
+    FREE(obj->pstStk);
+    FREE(obj);
+    return;
+}
+
+/*
+ *  leetcode 105:
+ *  Level    : easy
+ *  415. Add Strings
+ *
+ */
+char * addStrings(char * num1, char * num2){
+    int                 iLen                = 0;
+    char*               pcOut               = NULL;
+    int                 i                   = 0;
+    int                 j                   = 0;
+    int                 iIndex              = 0;
+    int                 iCarry              = 0;
+    
+    iLen    = MAX_INT(strlen(num1), strlen(num2)) + 1 + 1;
+    iIndex = iLen - 1 - 1;
+    pcOut = malloc(iLen);
+    memset(pcOut, 0, iLen);
+
+    for (i = strlen(num1) - 1, j = strlen(num2) - 1; (i >= 0) && (j >= 0); i--, j--)
+    {
+        pcOut[iIndex--] = (iCarry + num1[i] - '0' + num2[j] - '0') % 10 + '0';
+        iCarry = (iCarry + (num1[i] - '0') + (num2[j] - '0')) / 10;
+    }
+
+    while (i >= 0)
+    {
+        pcOut[iIndex--] = (iCarry + (num1[i] - '0')) % 10 + '0';
+        iCarry = (iCarry + (num1[i] - '0')) / 10;
+        i--;
+    }
+
+    while (j >= 0)
+    {
+        pcOut[iIndex--] = (iCarry + (num2[j] - '0')) % 10 + '0';
+        iCarry = (iCarry + (num2[j] - '0')) / 10;
+        j--;
+    }
+
+    if (1 == iCarry) 
+    {
+        pcOut[iIndex] = '1';
+        return pcOut;
+    }
+
+    return (pcOut + 1);
+}
+/*
+ *  leetcode 104:
+ *  Level    : easy
+ *  414. Third Maximum Number
+ *
+ */
+void sortArr(int* pi, int* pj, int *pk)
+{
+    int                 i                   = 0;
+
+    if (*pi < *pj) return;
+    i = *pi;
+    *pi = *pj;
+    *pj = i;
+    
+    if (*pj < *pk) return;
+    i = *pj;
+    *pj = *pk;
+    *pk = i;
+
+    return;
+}
+
+int thirdMax(int* nums, int numsSize){
+    int                 iMax1               = -2147483648; /* the 3th max num */
+    int                 iMax2               = -2147483648; /* the 2th max num */
+    int                 iMax3               = -2147483648; /* real the max num */
+    int                 i                   = 0;
+    int                 iSp                 = 0;
+
+    for (; i < numsSize; i++)
+    {
+        if (-2147483648 == nums[i]) iSp++;
+
+        if ((nums[i] > iMax1) && (nums[i] != iMax2) && (nums[i] != iMax3))
+        {
+            iMax1 = nums[i];
+            sortArr(&iMax1, &iMax2, &iMax3);           
+        }
+    }
+    
+    if (2 == numsSize - iSp) return -2147483648;
+    
+    if (-2147483648 == iMax1) return iMax3;
+
+    return iMax1;
+}
+/*
+ *  leetcode 103:
+ *  Level    : easy
+ *  412. Fizz Buzz
+ *
+ */
+char ** fizzBuzz(int n, int* returnSize){
+    char**              ppcOut              = NULL;
+    int                 i                   = 0;
+
+    if (n <= 0)  return NULL;
+
+    ppcOut = malloc(n * sizeof(char*));
+    memset(ppcOut, 0, sizeof(char*));
+    for (; i < n; i++)
+    {
+        ppcOut[i] = malloc(11);
+        memset(ppcOut[i], 0, 11);
+        if (0 == (i + 1) % 15)
+        {
+            sprintf(ppcOut[i], "%s", "FizzBuzz");
+        }
+        else if (0 == (i + 1) % 3)
+        {
+            sprintf(ppcOut[i], "%s", "Fizz");
+        }
+        else if (0 == (i + 1) % 5)
+        {
+            sprintf(ppcOut[i], "%s", "Buzz");
+        }
+        else
+        {
+            sprintf(ppcOut[i], "%d", i + 1);
+        }
+    }
+    
+    *returnSize = n;
+    return ppcOut;
+}
+/*
+ *  leetcode 102:
+ *  Level    : easy
+ *  409. Longest Palindrome
+ *
+ */
+int longestPalindrome(char * s){
+    int                 i                   = 0;
+    int                 aiMap[128]          = {0};
+    int                 iSum                = 0;
+    int                 iExist              = 0;
+    memset(aiMap, 0, 128 * sizeof(int));
+    if (strlen(s) < 0) return -1;
+
+    for (; i < strlen(s); i++)
+    {
+        aiMap[s[i]]++;
+    }
+
+    for (i = 0; i < strlen(s); i++)
+    {
+        if ((aiMap[s[i]] > 0) && (aiMap[s[i]] % 2 == 0)) 
+        {
+            iSum += aiMap[s[i]];
+            aiMap[s[i]] = 0;
+        }
+    
+        if ((aiMap[s[i]] % 2 == 1))
+        {
+            iExist = 1;
+            if (aiMap[s[i]] > 2)
+            {
+                iSum += aiMap[s[i]] - 1;
+                aiMap[s[i]] = 0;
+            }
+        }
+    }
+    return (iExist + iSum);
+}
+
+/*
+ *  leetcode 101:
+ *  Level    : easy
+ *  387. First Unique Character in a String
+ *
+ */
+int firstUniqChar(char * s){
+    int                 i                   = 0;
+    int                 aiMap[128]           = {0};
+    memset(aiMap, 0, 128 * sizeof(int));
+    if (strlen(s) < 0) return -1;
+    
+
+    for (; i < strlen(s); i++)
+    {
+        aiMap[s[i]]++;
+    }
+
+    for (i = 0; i < strlen(s); i++)
+    {
+        if (1 == aiMap[s[i]]) return i;
+    }
+    return -1;
+}
+
+/*
+ *  leetcode 100:
+ *  Level    : easy
+ *  350. Intersection of Two Arrays II
+ *
+ */
+void bubble_sort(int arr[], int len) {
+    int i, j, temp;
+    for (i = 0; i < len - 1; i++)
+        for (j = 0; j < len - 1 - i; j++)
+            if (arr[j] > arr[j + 1]) {
+                temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+            }
+    return;
+}
+int* intersect(int* nums1, int nums1Size, int* nums2, int nums2Size, int* returnSize){
+    int                 iSize               = 0;
+    int*                piOut               = NULL;
+    int                 i                   = 0;
+    int                 j                   = 0;
+    int                 k                   = 0;
+    int                 iCount              = 1; /* more than one */
+
+    if ((0 == nums1Size) || (0 == nums2Size))
+    {
+        *returnSize = 0;
+        return NULL;
+    }
+
+    iSize = MIN_INT(nums1Size, nums2Size);
+    piOut = malloc(sizeof(int) * iSize);
+    memset(piOut, 0, sizeof(int) * iSize);
+
+    bubble_sort(nums1, nums1Size);
+    bubble_sort(nums2, nums2Size);
+/*
+    qsort(nums1, nums1Size, sizeof(int), cmpn);
+    qsort(nums2, nums2Size, sizeof(int), cmpn);
+*/
+
+    for (; i < nums1Size - 1; i++)
+    {
+        if (nums1[i] == nums1[i + 1]) 
+        {
+            iCount++;
+            continue;
+        }
+        for (j = 0; (j < nums2Size) && (nums2[j] < nums1[i]); j++);
+        if ((j < nums2Size) && (nums2[j] == nums1[i]))
+        {
+            while ((iCount > 0) && (j < nums2Size) && (nums2[j] == nums1[i]))
+            {
+                piOut[k++] = nums1[i];
+                iCount--;
+                j++;
+            }
+        }
+        iCount = 1;
+    }
+
+    /* pro the last ele */
+    for (j = 0; (j < nums2Size) && (nums2[j] < nums1[nums1Size - 1]); j++);
+    if ((j < nums2Size) && (nums2[j] == nums1[nums1Size - 1])) piOut[k++] = nums1[nums1Size - 1];
+
+    while ((iCount > 1) && (j + 1 < nums2Size) && (nums2[j + 1] == nums1[i]))
+    {
+    printf("k = [%d], j = [%d] iCount = [%d].\n", k, j, iCount);
+        piOut[k++] = nums1[nums1Size - 1];
+        iCount--;
+        j++; 
+    }
+
+    *returnSize = k;
+    return piOut;
+}
+
+/*
+ *  leetcode 99:
+ *  Level    : easy
+ *  303. Range Sum Query - Immutable
+ *
+ */
+typedef struct {
+    int*    piNums;
+    int     numsSize;
+} NumArray;
+
+NumArray* numArrayCreate(int* nums, int numsSize) {
+   NumArray*            pstNumArr           = NULL;
+
+    pstNumArr = malloc(sizeof(*pstNumArr));
+    memset(pstNumArr, 0, sizeof(*pstNumArr));
+
+    pstNumArr->piNums = nums;
+    pstNumArr->numsSize = numsSize;
+
+    return pstNumArr;
+}
+
+int numArraySumRange(NumArray* obj, int i, int j) {
+    int                 k                   = 0;
+    int                 l                   = 0;
+    int                 iSum                = 0;
+    
+    k = MIN_INT(j, obj->numsSize - 1);
+
+    for (l = MAX_INT(i, 0); l <= k; l++)
+    {
+        iSum += obj->piNums[l];
+    }
+    return iSum;
+}
+
+void numArrayFree(NumArray* obj) {
+    free (obj);
+    obj = NULL;
+    return;
+}
+
+/*
+ *  leetcode 98:
+ *  Level    : easy
+ *  383. Ransom Note
+ *
+ */
+bool canConstruct(char * ransomNote, char * magazine){
+    int                 aiMap[128]          = {0};
+    int                 i                   = 0;
+
+    for (; i< strlen(magazine); i++)
+    {
+        aiMap[magazine[i]]++;
+    }
+
+    for (i = 0; i< strlen(ransomNote); i++)
+    {
+        aiMap[ransomNote[i]]--;
+        if (aiMap[ransomNote[i]] < 0) return false;
+    }
+
+    return true;
+}
+
+
+/*
+ *  leetcode 97:
+ *  Level    : easy
+ *  349. Intersection of Two Arrays
+ *
+ */
+int* intersection(int* nums1, int nums1Size, int* nums2, int nums2Size, int* returnSize){
+    int                 iSize               = 0;
+    int*                piOut               = NULL;
+    int                 i                   = 0;
+    int                 j                   = 0;
+    int                 k                   = 0;
+
+    if ((0 == nums1Size) || (0 == nums2Size))
+    {
+        *returnSize = 0;
+        return NULL;
+    }
+
+    iSize = MIN_INT(nums1Size, nums2Size);
+    piOut = malloc(sizeof(int) * iSize);
+    memset(piOut, 0, sizeof(int) * iSize);
+
+    qsort(nums1, nums1Size, sizeof(int), cmpn);
+    qsort(nums2, nums2Size, sizeof(int), cmpn);
+
+    for (; i < nums1Size - 1; i++)
+    {
+        if (nums1[i] == nums1[i + 1]) continue;
+        for (j = 0; (j < nums2Size) && (nums2[j] < nums1[i]); j++);
+        if ((j < nums2Size) && (nums2[j] == nums1[i]))
+        {
+            piOut[k++] = nums1[i];
+        }
+    }
+
+    /* pro the last ele */
+    for (j = 0; (j < nums2Size) && (nums2[j] < nums1[nums1Size - 1]); j++);
+    if ((j < nums2Size) && (nums2[j] == nums1[nums1Size - 1])) piOut[k++] = nums1[nums1Size - 1];
+
+    *returnSize = k;
+    return piOut;
+}
+
+
+/*
+ *  leetcode 96:
+ *  Level    : easy
+ *  345. Reverse Vowels of a String
+ *
+ */
+#define IS_VOWELS_CHAR(c)  ((c == 'a') || (c == 'e') || (c == 'i') || (c == 'o') || (c == 'u') || (c == 'A') || (c == 'E') || (c == 'I') || (c == 'O') || (c == 'U') )
+char * reverseVowels(char * s){
+    int                 i                   = 0;
+    int                 j                   = 0;
+    char                acC                 = 0;
+    j = strlen(s) - 1;
+    for (; i < j;)
+    {
+        if (!IS_VOWELS_CHAR(s[i]))
+        {
+            i++;
+            continue;
+        }
+
+        if (!IS_VOWELS_CHAR(s[j]))
+        {
+            j--;
+            continue;
+        }
+
+        acC  = s[i];
+        s[i] = s[j];
+        s[j] = acC;
+        i++;
+        j--;
+    }
+    return s;
+}
+/*
+ *  leetcode 95:
+ *  Level    : easy
+ *  344. Reverse String
+ *
+ */
+void reverseString(char* s, int sSize){
+    int                 i                   = 0;
+    int                 j                   = 0;
+    char                acC                 = 0;
+
+    j = sSize - 1;
+    for (; i < j; i++, j--)
+    {
+        acC  = s[i];
+        s[i] = s[j];
+        s[j] = acC;
+    }
+
+    return;
+
+}
+/*
+ *  leetcode 94:
+ *  Level    : easy
+ *  290. Word Pattern
+ *
+ */
+bool wordPattern(char * pattern, char * str){
+    /* construct maps */
+    char**              ppcStr              = NULL;
+    int                 i                   = 0;
+    int                 j                   = 0;
+    int                 k                   = 0;
+    int                 m                   = 0;
+    char*               pcPrev              = NULL;
+    char                aiMap[128]          = {0}; /* asc code */
+    int                 iRet                = true;
+
+    ppcStr = malloc(strlen(pattern) * sizeof(char*) + 1);
+    memset(ppcStr, 0, strlen(pattern) * sizeof(char*) + 1);
+    
+    
+    pcPrev = strtok(str, " ");
+    while (pcPrev)
+    {
+        if (k == strlen(pattern)) 
+        {
+            iRet = false;
+            goto end;
+        }
+
+        ppcStr[k] = malloc(strlen(pcPrev) + 1);
+
+        memset(ppcStr[k], 0, strlen(pcPrev) + 1);
+        strcpy(ppcStr[k], pcPrev);     
+        k++;
+
+        pcPrev = strtok(NULL, " ");
+    }
+
+    if (k < strlen(pattern))
+    {
+        iRet = false;
+        goto end;
+    }
+
+    for (i = 0; i < strlen(pattern); i++)
+    {
+        if (0 == aiMap[pattern[i]])
+        {
+            for (m = 0; m < i; m++)
+            {
+                if (pattern[m] != pattern[i])              
+                {
+                    if (0 == strcmp(ppcStr[i], ppcStr[m]))
+                    {
+                        iRet = false;
+                        goto end;
+                    }
+                }
+            }
+            aiMap[pattern[i]] = 1;
+            for (j = i + 1; j < strlen(pattern); j++)
+            {
+                if (pattern[i] == pattern[j])
+                {
+                    if (0 != strcmp(ppcStr[i], ppcStr[j]))
+                    {
+                        iRet = false;
+                        goto end;
+                    }
+                }
+            }
+        }
+    
+    }
+
+end:
+    
+    for (i = 0; i < k; i++)
+    {
+        FREE(ppcStr[i]);
+    }
+    FREE(ppcStr);
+    
+    return iRet;
+}
+
+/*
+ *  leetcode 93:
+ *  Level    : easy
+ *  235. Lowest Common Ancestor of a Binary Search Tree
+ *
+ */
+struct TreeNode* lowestCommonAncestor(struct TreeNode* root, struct TreeNode* p, struct TreeNode* q) {
+    int                 iHp                 = 0;    
+    int                 iHq                 = 0;    
+
+    iHp = getNodeHeight(root, p);
+    iHq = getNodeHeight(root, q);
+
+    while (iHp > iHq)
+    {
+        p = getNodeParent(root, q);
+        iHq++;
+    } 
+    
+    while (iHp < iHq)
+    {
+        q = getNodeParent(root, q);
+        iHp++;
+    } 
+
+    if (p == q) return p;
+    
+    while (p != q)
+    {
+        p = getNodeParent(root, p);
+        q = getNodeParent(root, q);
+    }
+    return p;
+}
+
+/*
+ *  leetcode 92:
+ *  Level    : easy
+ *  278. First Bad Version
+ *
+ */
+bool isBadVersion(int version){
+    if (version >= 4) return true;
+    return false;
+}
+
+int firstBadVersion(int n) {
+    long long                  iLeft               = 1; 
+    long long                  iRight              = n;
+
+    while (iLeft < iRight)
+    {
+        if (isBadVersion((iLeft + iRight) / 2))
+        {
+            iRight = (iLeft + iRight) / 2;
+        }
+        else
+        {
+            iLeft = (iLeft + iRight) / 2 + 1;
+        }
+    }
+    return iRight;
+}
+
+/*
+ *  leetcode 91:
+ *  Level    : easy
+ *  234. Palindrome Linked List
+ *
+ */
+bool isPalindrome(struct ListNode* head) {
+    /* 1. get mid use fast and slow */
+    struct ListNode*    pstSlow             = NULL;
+    struct ListNode*    pstFast             = NULL;
+    struct ListNode*    pstPrev             = NULL;
+    struct ListNode*    pstNext             = NULL;
+
+    pstSlow = head;
+    pstFast = head;
+    while (pstFast)
+    {
+        pstSlow = pstSlow->next;
+        pstFast = (pstFast->next) ? pstFast->next->next : pstFast->next;
+    }
+
+    /* 2. reverse */
+    while (pstSlow)
+    {
+        pstNext = pstSlow->next;
+        pstSlow->next = pstPrev;
+        pstPrev = pstSlow;
+        pstSlow = pstNext;
+    }
+
+    /* 3. compare */
+    while (pstPrev)
+    {
+        if (pstPrev->val != head->val) return false;
+        pstPrev = pstPrev->next;
+        head = head->next;
+    }
+    return true;
+}
+/*
+ *  leetcode 90:
+ *  Level    : easy
+ *  257. Binary Tree Paths
+ *
+ */
+#if 0
+TODO: by a clear head 
+void travelNode(
+    struct TreeNode* root, 
+    char** ppcIn,
+    int    iIn, 
+    char** ppcOut, 
+    int*   piOut, 
+    int    iOutCount /* current index */
+    )
+{
+    char*               pcTmp               = NULL;
+    int*                piTmp               = NULL;
+    if (!root) return;
+     
+    if (isLeafNode(root))
+    {
+        piTmp = malloc(sizeof(int) * (iOutCount + 1));
+        memset(piTmp, 0, sizeof(int) * (iOutCount + 1));
+        memcpy(piTmp, piOut, iOutCount * sizeof(int));
+        piTmp[iOutCount] = iIn + 1;
+        piOut = piTmp;
+
+        pcTmp = malloc(sizeof(char*) * (iOutCount + 1));
+        memset(pcTmp, 0, sizeof(char*) * (iOutCount + 1));
+        memcpy(pcTmp, ppcOut, iOutCount);
+
+        pcTmp[iOutCount] = malloc(12);
+        memset(pcTmp[iOutCount], 0, 12);
+        sprintf(pcTmp[iOutCount], "%d", root->val);
+        free(ppcOut);
+        ppcOut = pcTmp;
+
+        return;
+    }
+    
+    
+}
+char ** binaryTreePaths(struct TreeNode* root, int* returnSize){
+    char**              ppcOut              = NULL;
+    char**              ppcIn               = NULL;
+    int*                piIn                = NULL;
+
+    if (!root)  return NULL;
+
+    /* add tail for end tag */
+    piIn = malloc(sizeof(int));
+    memset(piIn, 0, sizeof(int));
+    piIn[0] = 1;
+
+    ppcIn = malloc(sizeof(char*) * 1);
+    memset(ppcIn, 0, sizeof(char*));
+
+    *ppcIn = malloc(12);
+    memset(*ppcIn, 0, 12);
+    sprintf(*ppcIn, "%d", root->val);
+
+    if (isLeafNode(root))
+    {
+        ppcOut = ppcIn;
+        returnSize = piIn;
+        return ppcOut;
+    }
+
+    travelNode(root->left, ppcIn, *piIn, ppcOut, piOut, 1);
+    travelNode(root->right, ppcIn, *piIn, ppcOut, piOut, 1);
+
+    return ppcOut;
+}
+#endif
+
+/*
+ *  leetcode 89:
+ *  Level    : easy
+ *  237. Delete Node in a Linked List
+ *
+ */
+void deleteNode(struct ListNode* node) {
+    if (!node) return;
+    node->val = node->next->val;
+    node->next = node->next->next;
+    return;
+}
+/*
+ *  leetcode 88:
+ *  Level    : easy
+ *  226. Invert Binary Tree
+ *
+ */
+struct TreeNode* invertTree(struct TreeNode* root){
+    struct TreeNod*     pstNode             = NULL;
+
+    if (root)
+    {
+        pstNode = root->left;
+        root->left = root->right;
+        root->right = pstNode;
+        invertTree(root->left);
+        invertTree(root->right);
+    }
+
+    return root;
+}
+/*
+ *  leetcode 87:
+ *  Level    : easy
+ *  225. Implement Stack using Queues
+ *
+ */
+
+
+/** Initialize your data structure here. */
+
+MyStack* myStackCreate() {
+    MyStack*            pstStk  = NULL;
+    pstStk = malloc(sizeof(MyStack));
+    assert(NULL != pstStk);
+    memset(pstStk, 0, sizeof(MyStack));
+    
+    pstStk->iSize   = DFT_STK_SIZE;
+    pstStk->iTop    = 0;
+    pstStk->piEle   = malloc(sizeof(int) * DFT_STK_SIZE);
+    assert(NULL != pstStk->piEle);
+    memset(pstStk->piEle, 0, sizeof(int) * DFT_STK_SIZE);
+
+    return pstStk;
+}
+
+/** Push element x onto stack. */
+void myStackPush(MyStack* obj, int x) {
+    int*                piEle                   = NULL;
+    assert(NULL != obj);
+    
+    if (obj->iTop == obj->iSize)
+    {
+        /* full */
+        piEle = malloc(sizeof(int) * obj->iSize * 2);
+        assert(NULL != piEle);
+        memset(piEle, 0, sizeof(int) * (obj->iSize * 2));
+        memcpy(piEle, obj->piEle, obj->iSize * sizeof(int));
+        free(obj->piEle);
+        obj->piEle  = piEle;
+        obj->iSize  = obj->iSize * 2;
+    }
+    
+    obj->piEle[obj->iTop++] = x;
+    return; 
+}
+
+/** Removes the element on top of the stack and returns that element. */
+int myStackPop(MyStack* obj) {
+    
+    assert(NULL != obj);
+    if (obj->iTop == 0)  return EMPTY_STK_VALUE;
+    obj->iTop--;
+
+    return obj->piEle[obj->iTop];
+}
+
+/** Get the top element. */
+int myStackTop(MyStack* obj) {
+    return obj->piEle[obj->iTop - 1];
+}
+
+/** Returns whether the stack is empty. */
+bool myStackEmpty(MyStack* obj) {
+    return (obj->iTop == 0);
+}
+
+void myStackFree(MyStack* obj) {
+    free(obj->piEle);    
+    obj->piEle  = NULL;
+    free(obj);
+    obj = NULL;
+    return;
+}
+    
+
+int main()
+{
+    int                 iRet                    = 0;
+    //char*               pcOut                   = "Hello, my name is John";
+    char*               pcOut                   = "foo    bar  ";
+    int                 aiArr[]                 = {4,3,2,7,8,2,3,1};
+    int*                piRet                   = NULL;
+
+    
+    iRet = findComplement(5);
+    printf("iRet = [%d].\n", iRet);
+
+    
+    return iRet;
+#if 0
+    int                 aiArr[]                 = {89,46,96,79,2,46,59,71,7,74,55,92,70,83,26,82,4,28,87,17,93,22,13,0,76,89,14,57,4,11,12,89,15,66,59,5,45,31,31,92,96,72,61,10,36,21,75,14,33,2,8,68,79,26,13,28,14,2,81,61,88,44,16,61,34,56,8,19,20,48,8,94,2,22,15,60,91,86,18,92,30,59,88,85,92,21,3,64,22,7,62,42,32,10,71,42,91,96};
+    int                 aiArr1[]                 = {3,33,81,65,22,0,39,70,41,38,78,78,32,89,34,67,71,33,49,6,17,86,91,58,64,76,48,46,31,14,81,62,48,37,37,51,97,96,28,13,28,37,69,43,15};
+    int*                piRet                   = NULL;
+    piRet = intersect(aiArr, sizeof(aiArr) /sizeof(int), aiArr1, sizeof(aiArr1) /sizeof(int), &iRet);
+    
+    return iRet;
+    char*               pcArr                   = malloc(128);
+    memset(pcArr, 0, 128);
+    //memcpy(pcArr, "dog cat cat dog", strlen("dog cat cat dog"));
+    memcpy(pcArr, "jquery", strlen("jquery"));
+    
+    iRet = wordPattern("jquery", pcArr);
+    
+    printf("iRet = [%d].\n", iRet);
+    return iRet;
+    iRet = firstBadVersion(5);
+    iRet = canConstruct("a", "b");
+    printf("iRet = [%d].\n", iRet);
+#endif
+}
