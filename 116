@@ -1,0 +1,310 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <assert.h>
+#include <stdint.h>
+#include <math.h>
+#include <pthread.h>
+#include <semaphore.h>
+
+#include "leetcode.h"
+
+/*
+ *  leetcode 114:
+ *  Level    : mid
+ *  1114. Print in Order
+ *  realize by sem
+ */
+
+#define CHECK_VARIABLE(l,r) do{if(0 != r){fprintf(stderr,"[%s], err:[%d]\n",l,r);break;}}while(0);
+#define SET_BIT(x, y)  (x |= (1<<y))
+#define NEG_BIT(x, y)  (x ^= (1<<y))
+#define GET_BIT(x, y)  ((x)>>y & 0x1)
+#define L sem_t
+#define LOCK(t) sem_wait(&t)
+#define UNLOCK(t) sem_post(&t)
+#define RETURN_IF_ERR(ret) \
+    if (0 != ret) {printf("Get errorcode = [%d] line = [%d].\n", ret, __LINE__); return ret;}
+
+#if 0
+/* use sem */
+L tL1;
+L tL2;
+
+/* A -> B -> C */
+
+void P(L* t)
+{ 
+    while (sem_trywait(t) != 0) {}
+    return;
+}
+
+void V(L* t)
+{ 
+    if (sem_post(t) == -1) {
+        fprintf(stderr, "[%s].\n", "sem_post error.");
+    }
+    return;
+}
+typedef struct {
+    sem_t tWakeUpB;
+    sem_t tWakeUpC;
+} Foo;
+
+Foo* fooCreate() {
+    Foo* obj = (Foo*) malloc(sizeof(Foo));    
+
+    sem_init(&(obj->tWakeUpB), 0, 0);
+    sem_init(&(obj->tWakeUpC), 0, 0);
+
+    return obj;
+}
+
+void printFirst()
+{
+    printf("frist");
+    return;
+}
+void printSecond()
+{
+    printf("second");
+    return;
+}
+void printThird()
+{
+    printf("third");
+    return;
+}
+void first(Foo* obj) {    
+    printFirst();
+    V(&(obj->tWakeUpB));
+}
+
+void second(Foo* obj) {
+    P(&(obj->tWakeUpB));
+    printSecond();
+    V(&(obj->tWakeUpC));
+}
+
+void third(Foo* obj) {
+    P(&(obj->tWakeUpC));
+    printThird();
+    
+    return;
+}
+
+void fooFree(Foo* obj) {
+    sem_destroy(&(obj->tWakeUpB));
+    sem_destroy(&(obj->tWakeUpC));
+
+    if (obj)
+    {
+        free(obj);
+        obj=NULL;
+    }
+    return;
+}
+#endif
+
+#if 0
+/* use mutex */
+
+#define CHECK_VARIABLE(l,r) do{if(0 != r){fprintf(stderr,"[%s], err:[%d]\n",l,r);break;}}while(0);
+#define SET_BIT(x, y)  (x |= (1<<y))
+#define NEG_BIT(x, y)  (x ^= (1<<y))
+#define GET_BIT(x, y)  ((x)>>y & 0x1)
+#define L pthread_mutex_t
+#define LOCK(t) pthread_mutex_lock(t)
+#define UNLOCK(t) pthread_mutex_unlock(t)
+#define RETURN_IF_ERR(ret) \
+    if (0 != ret) {printf("Get errorcode = [%d] line = [%d].\n", ret, __LINE__); return ret;}
+
+void P(L* t)
+{ 
+    while (LOCK(t) != 0) {}
+    return;
+}
+
+void V(L* t)
+{ 
+    if (UNLOCK(t) == -1) {
+        fprintf(stderr, "[%s].\n", "UNLOCK error.");
+    }
+    return;
+}
+typedef struct {
+    L tWakeUp;
+    int iGuide;
+} Foo;
+
+Foo* fooCreate() {
+    Foo* obj = (Foo*) malloc(sizeof(Foo));    
+
+    pthread_mutex_init(&(obj->tWakeUp), NULL);
+    obj->iGuide = 1;
+
+    return obj;
+}
+
+void first(Foo* obj) {    
+    while (1)
+    {
+        P(&(obj->tWakeUp));
+        if (obj->iGuide != 1)
+        {
+            V(&(obj->tWakeUp));
+            continue;
+            
+        }
+        printFirst();
+        obj->iGuide = 2;
+        V(&(obj->tWakeUp));
+        break;
+    }
+}
+
+void second(Foo* obj) {
+   while (1)
+    {
+        P(&(obj->tWakeUp));
+        if (obj->iGuide != 2)
+        {
+            V(&(obj->tWakeUp));
+            continue;       
+        }
+        printSecond();
+        obj->iGuide = 3;
+        V(&(obj->tWakeUp));
+        break;
+    }
+}
+
+void third(Foo* obj) {
+   while (1)
+    {
+        P(&(obj->tWakeUp));
+        if (obj->iGuide != 3)
+        {
+            V(&(obj->tWakeUp));
+            continue;       
+        }
+        printThird();
+        V(&(obj->tWakeUp));
+        break;
+   }
+    return;
+}
+
+void fooFree(Foo* obj) {
+    pthread_mutex_destroy(&(obj->tWakeUp));
+
+    if (obj)
+    {
+        free(obj);
+        obj=NULL;
+    }
+    return;
+}
+#endif 
+
+#if 1
+/* cond + mutex */
+typedef struct {
+    pthread_mutex_t tMutex;
+    pthread_cond_t  tCond ;
+    int iGuide;
+} Foo;
+
+Foo* fooCreate() {
+    Foo* obj = (Foo*) malloc(sizeof(Foo));
+    (void)pthread_cond_init(&(obj->tCond), NULL);
+    (void)pthread_mutex_init(&(obj->tMutex), NULL);
+    obj->iGuide = 1;
+    
+    return obj;
+}
+
+void first(Foo* obj) {
+    pthread_mutex_lock(&(obj->tMutex));
+    while (obj->iGuide != 1)
+    {
+        pthread_cond_wait(&(obj->tCond), &(obj->tMutex));
+    }
+    
+    printFirst();
+    obj->iGuide = 2;
+    pthread_cond_broadcast(&(obj->tCond));
+    pthread_mutex_unlock(&(obj->tMutex));
+    return;
+}
+
+void second(Foo* obj) {
+    pthread_mutex_lock(&(obj->tMutex));
+    while (obj->iGuide != 2)
+    {
+        pthread_cond_wait(&(obj->tCond), &(obj->tMutex));
+    }
+    
+    printSecond();
+    obj->iGuide = 3;
+    pthread_cond_broadcast(&(obj->tCond));
+    pthread_mutex_unlock(&(obj->tMutex));
+    return;   
+}
+
+void third(Foo* obj) {
+    pthread_mutex_lock(&(obj->tMutex));
+    while (obj->iGuide != 3)
+    {
+        pthread_cond_wait(&(obj->tCond), &(obj->tMutex));
+    }
+    
+    printThird();
+    obj->iGuide = -1;
+    pthread_cond_broadcast(&(obj->tCond));
+    pthread_mutex_unlock(&(obj->tMutex));
+    return;   
+}
+
+void fooFree(Foo* obj) {
+    if (obj)
+    {
+        pthread_cond_destroy(&(obj->tCond));
+        pthread_mutex_destroy(&(obj->tMutex));
+        free(obj);
+        obj = NULL;
+    }
+    return;
+}
+
+#endif
+int main()
+{
+    int             iRet            = 0;
+    int*            pvRet           = NULL;
+    pthread_t       tTid1           = 0;
+    pthread_t       tTid2           = 0;
+    pthread_t       tTid3           = 0;
+
+    Foo*            obj             = NULL;
+
+#if 0
+    obj = fooCreate();
+    RETURN_IF_ERR(obj == NULL);
+
+    iRet = pthread_create(&tTid2, NULL, second, obj);
+    iRet = pthread_create(&tTid1, NULL, first, obj);
+    iRet = pthread_create(&tTid3, NULL, third, obj);
+
+    iRet = pthread_join(tTid1, NULL);
+    RETURN_IF_ERR(iRet);
+    iRet = pthread_join(tTid2, NULL);
+    RETURN_IF_ERR(iRet);
+
+    iRet = pthread_join(tTid3, NULL);
+    RETURN_IF_ERR(iRet);
+
+    fooFree(obj);
+#endif
+    return iRet;
+}

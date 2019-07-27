@@ -1,0 +1,336 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <assert.h>
+#include <stdint.h>
+#include <math.h>
+#include <pthread.h>
+
+#include "leetcode.h"
+/*
+ *  leetcode 114:
+ *  Level    : mid
+ *  1116. Print Zero Even Odd
+ *
+ */
+
+void printNumber(int x)
+{
+    printf("%d", x); return;
+}
+typedef struct {
+    int n;
+} ZeroEvenOdd;
+
+ZeroEvenOdd* zeroEvenOddCreate(int n) {
+    ZeroEvenOdd* obj = (ZeroEvenOdd*) malloc(sizeof(ZeroEvenOdd));
+    obj->n = n;
+    return obj;
+}
+
+int g_iCurIndex = -1;
+pthread_mutex_t g_tMutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t g_tCond   = PTHREAD_COND_INITIALIZER;
+
+void zero(ZeroEvenOdd* obj) {   
+    int             iRet                = 0;
+
+    while (1)
+    {
+        iRet = pthread_mutex_lock(&g_tMutex);
+        if (iRet) continue;
+
+        while (g_iCurIndex % 2 != 0)
+        {
+            pthread_cond_wait(&g_tCond, &g_tMutex);
+        }
+
+        if (g_iCurIndex == obj->n * 2) 
+        {
+            g_iCurIndex = 0;
+printf("zero starting  exit .\n");
+            pthread_cond_broadcast(&g_tCond);
+            pthread_mutex_unlock(&g_tMutex);
+            /* free obj */
+            zeroEvenOddFree(obj);
+            break;
+        }
+        
+        printNumber(0);
+        g_iCurIndex++;
+        pthread_mutex_unlock(&g_tMutex);
+        pthread_cond_broadcast(&g_tCond);
+    }
+printf("zero exit .\n");
+    
+    pthread_exit(NULL);
+}
+
+void odd(ZeroEvenOdd* obj) { 
+    int             iRet                = 0;
+    while (1)
+    {
+        iRet = pthread_mutex_lock(&g_tMutex);
+        if (iRet) continue;
+
+        while ((g_iCurIndex % 2 == 0) 
+            || (g_iCurIndex % 4 != 1))
+        {
+            pthread_cond_wait(&g_tCond, &g_tMutex);
+        }
+        iRet = g_iCurIndex;
+        printNumber((iRet + 1) / 2);
+        g_iCurIndex++;
+        pthread_mutex_unlock(&g_tMutex);
+        pthread_cond_broadcast(&g_tCond);
+
+        if (iRet + 4 > obj->n * 2) break;
+        
+    }
+    
+printf("odd  exit.\n");
+    pthread_exit(NULL); 
+}
+
+
+void even(ZeroEvenOdd* obj) {
+    int             iRet                = 0;
+
+    while (iRet = pthread_mutex_lock(&g_tMutex) != 0);
+    g_iCurIndex = 0;
+    pthread_mutex_unlock(&g_tMutex);
+
+    while (1)
+    {
+        iRet = pthread_mutex_lock(&g_tMutex);
+        if (iRet) continue;
+
+        while ((g_iCurIndex % 2 == 0) 
+            || (g_iCurIndex % 4 != 3))
+        {
+
+printf("even waiting  cond.\n");
+            pthread_cond_wait(&g_tCond, &g_tMutex);
+printf("\neven get cond.\n");
+            if (g_iCurIndex == 0) 
+            {
+printf("even  exit.\n");
+                pthread_exit(NULL); 
+            }
+        }
+
+        printNumber((g_iCurIndex + 1 ) / 2);
+        iRet = g_iCurIndex;
+        g_iCurIndex++;
+        pthread_mutex_unlock(&g_tMutex);
+        pthread_cond_broadcast(&g_tCond);
+
+        if (iRet + 4 > obj->n * 2) break;
+    }
+
+    pthread_exit(NULL); 
+}
+
+void zeroEvenOddFree(ZeroEvenOdd* obj) {
+    if (obj) 
+    {
+        free(obj);
+        obj = NULL;
+    }
+    return; 
+}
+
+/*
+ *  leetcode 113:
+ *  Level    : easy
+ *  1051. Height Checker
+ *
+ */
+int heightChecker(int* heights, int heightsSize){
+    int                 aiDmpArr[heightsSize];
+    int                 iCount                  = 0;
+    int                 i                       = 0;
+
+    memset(aiDmpArr, 0, sizeof(int) * heightsSize);
+    memcpy(aiDmpArr, heights, sizeof(int) * heightsSize);
+    qsort(aiDmpArr, heightsSize, sizeof(int), cmpn);
+
+    for (; i < heightsSize; i++)
+    {
+        if (heights[i] != aiDmpArr[i]) iCount++;
+    }
+
+    return iCount;
+}
+
+
+/*
+ *  leetcode 112:
+ *  Level    : easy
+ *  1089. Duplicate Zeros
+ *
+ */
+void duplicateZeros(int* arr, int arrSize){
+    int                 aiDmpArr[arrSize];
+    int                 i                       = 0;
+    int                 j                       = 0;
+
+    memset(aiDmpArr, 0, sizeof(int) * arrSize);
+    memcpy(aiDmpArr, arr, sizeof(int) * arrSize);
+
+    for (i = 0; (i < arrSize) && (j < arrSize); i++)
+    {
+        if (aiDmpArr[i] == 0)
+        {
+            if (j + 1 < arrSize)
+            {
+                arr[j] = arr[j + 1] = 0;
+                j = j + 2;
+            }
+            else
+            {
+                arr[j++] = 0;
+            }
+        }
+        else
+        {
+            arr[j] = aiDmpArr[i];
+            j++;
+        }
+    }
+    return;
+}
+
+/*
+ *  leetcode 111:
+ *  Level    : easy
+ *  1108. Defanging an IP Address
+ *  
+ *
+ */
+char * defangIPaddr(char * address){
+    int                 iCount                  = 0;
+    char*               pcPos                   = NULL;
+    char*               pcOut                   = NULL;
+
+    if (!address) return NULL;
+    pcPos = address;
+
+    while (*pcPos)
+    {
+        if (*pcPos == '.') iCount++;
+        pcPos++;
+    }
+
+    pcOut = malloc(strlen(address) + iCount * 2 + 1);
+    memset(pcOut, 0, sizeof(pcOut));
+
+    for (pcPos = address; *pcPos != '\0'; pcPos++)
+    {
+        if (*pcPos =='.')
+            strcat(pcOut, "[.]");
+        else
+            strncat(pcOut, pcPos, 1);
+    }
+    
+    return pcOut;
+}
+
+/*
+ *  leetcode 110:
+ *  Level    : easy
+ *  1078. Bigram 
+ *  Note: The returned array must be malloced, assume caller calls free().
+ *
+ */
+char ** findOcurrences(char * text, char * first, char * second, int* returnSize){
+    char*               pcS1                    = NULL;
+    char*               pcS2                    = NULL;
+    char*               pcTar                   = NULL;
+    char**              ppcTar                  = NULL;
+    int                 iTarCount               = 0;
+
+    if (!text) return NULL;
+
+    ppcTar = malloc(sizeof(char*) * (strlen(text) / strlen(first)));
+    memset(ppcTar, 0, sizeof(ppcTar));
+    pcS1 = text;
+
+start:
+    /* get first pos */
+    while (pcS1 && strncmp(text, first, strlen(first))) pcS1++;
+
+    if (!pcS1) return NULL;
+    
+    pcS1 = pcS1 + strlen(first);
+    /* get second pos */ 
+    if (' ' != *pcS1)
+        goto start;
+    pcS1++;
+    if (!strncmp(pcS1, second, strlen(second)))
+    {
+        pcS1 = pcS1 + strlen(second);
+        if  (' ' != *pcS1) goto start;
+        pcS1++;
+        pcS2 = pcS1;
+        while (pcS2 && (*pcS2 != ' ')) pcS2++;
+        pcTar = malloc(pcS2 - pcS1);
+        memset(pcTar, 0 , pcS2 - pcS1);
+        memcpy(pcTar, pcS1, pcS2 - pcS1);
+        ppcTar[iTarCount++] = ppcTar;
+        pcS1 = pcS2;
+        goto start;
+    }
+    return ppcTar;
+}
+
+#define RETURN_IF_ERR(ret) \
+    if (0 != ret) {printf("Get errorcode = [%d] line = [%d].\n", ret, __LINE__); return ret;}
+int main()
+{
+    int             iRet            = 0;
+    int*            pvRet           = NULL;
+    pthread_t       tTid1           = 0;
+    pthread_t       tTid2           = 0;
+    pthread_t       tTid3           = 0;
+
+    ZeroEvenOdd*    obj             = NULL;
+
+#if 0
+    obj = zeroEvenOddCreate(1);
+    RETURN_IF_ERR(obj == NULL);
+
+    iRet = pthread_create(&tTid1, NULL, zero, obj);
+    iRet = pthread_create(&tTid2, NULL, even, obj);
+    iRet = pthread_create(&tTid3, NULL, odd, obj);
+
+    iRet = pthread_join(tTid1, NULL);
+    RETURN_IF_ERR(iRet);
+    iRet = pthread_join(tTid2, NULL);
+    RETURN_IF_ERR(iRet);
+    iRet = pthread_join(tTid3, NULL);
+    RETURN_IF_ERR(iRet);
+#endif
+    
+#if 1
+    obj = zeroEvenOddCreate(1);
+    RETURN_IF_ERR(obj == NULL);
+
+    iRet = pthread_create(&tTid2, NULL, even, obj);
+    if (iRet) return iRet;
+    iRet = pthread_create(&tTid1, NULL, zero, obj);
+    if (iRet) return iRet;
+
+    iRet = pthread_create(&tTid3, NULL, odd, obj);
+    if (iRet) return iRet;
+printf("\n%x %x %x.\n", tTid1, tTid2, tTid3);
+
+    iRet = pthread_join(tTid3, NULL);
+    RETURN_IF_ERR(iRet);
+    iRet = pthread_join(tTid1, NULL);
+    RETURN_IF_ERR(iRet);
+    iRet = pthread_join(tTid2, NULL);
+    RETURN_IF_ERR(iRet);
+#endif
+    return iRet;
+}

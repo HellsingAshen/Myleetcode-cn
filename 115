@@ -1,0 +1,145 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <assert.h>
+#include <stdint.h>
+#include <math.h>
+#include <pthread.h>
+
+#include "leetcode.h"
+
+/*
+ *  leetcode 115:
+ *  Level    : mid
+ *  1115. Print FooBar Alternately
+ *  realize by mutexs
+ */
+
+#define CHECK_VARIABLE(l,r) do{if(0 != r){fprintf(stderr,"[%s], err:[%d]\n",l,r);break;}}while(0);
+#define SET_BIT(x, y)  (x |= (1<<y))
+#define NEG_BIT(x, y)  (x ^= (1<<y))
+#define GET_BIT(x, y)  ((x)>>y & 0x1)
+#define L pthread_mutex_t
+#define LOCK(t) pthread_mutex_lock(&t)
+#define UNLOCK(t) pthread_mutex_unlock(&t)
+
+pthread_once_t tOnce = PTHREAD_ONCE_INIT;
+L tL1;
+L tL2;
+
+void P(L* t)
+{ 
+    while (pthread_mutex_trylock(t) != 0) {}
+    return;
+}
+
+void V(L* t)
+{ 
+    if (pthread_mutex_unlock(t) == -1) {
+        fprintf(stderr, "[%s].\n", "pthread_mutex_unlock error.");
+    }
+    return;
+}
+
+void printFoo()
+{
+    printf("Foo"); 
+    return;
+}
+
+void printBar()
+{
+    printf("Bar"); 
+    return;
+}
+
+
+typedef struct {
+    int n;
+} FooBar;
+
+FooBar* fooBarCreate(int n) {
+    FooBar* obj = (FooBar*) malloc(sizeof(FooBar));
+    obj->n = n;
+    return obj;
+}
+
+void threadOnceInit(){
+    int iRet = -1;
+
+    iRet    = pthread_mutex_init(&tL1, NULL);
+    CHECK_VARIABLE("tL1 init error.", iRet);
+
+    iRet    = pthread_mutex_init(&tL2, NULL);
+    CHECK_VARIABLE("tL1 init error.", iRet);
+
+    P(&tL2);
+
+    return;
+}
+
+void foo(FooBar* obj) {
+    int iRet = 0;
+    int i    = 0;
+    iRet = pthread_once(&tOnce, threadOnceInit);
+    CHECK_VARIABLE("pthread_once error. \n", iRet);
+    for (; i < obj->n; i++) {
+        P(&tL1);        
+        printFoo();
+        V(&tL2);
+    }
+    return;
+}
+
+void bar(FooBar* obj) {
+    int iRet = 0;
+    int i    = 0;
+    iRet = pthread_once(&tOnce, threadOnceInit);
+    CHECK_VARIABLE("pthread_once error. \n", iRet);
+
+    for (; i < obj->n; i++) {
+        P(&tL2);        
+        printBar();
+        V(&tL1);
+    }
+}
+
+void fooBarFree(FooBar* obj) {
+    if (obj)
+    {
+        free(obj);
+        obj = NULL;
+    }
+    return;
+}
+
+
+#define RETURN_IF_ERR(ret) \
+    if (0 != ret) {printf("Get errorcode = [%d] line = [%d].\n", ret, __LINE__); return ret;}
+int main()
+{
+    int             iRet            = 0;
+    int*            pvRet           = NULL;
+    pthread_t       tTid1           = 0;
+    pthread_t       tTid2           = 0;
+
+    FooBar*    obj             = NULL;
+
+#if 1
+    obj = fooBarCreate(2);
+    RETURN_IF_ERR(obj == NULL);
+
+    iRet = pthread_create(&tTid1, NULL, foo, obj);
+    iRet = pthread_create(&tTid2, NULL, bar, obj);
+
+    iRet = pthread_join(tTid1, NULL);
+    RETURN_IF_ERR(iRet);
+    iRet = pthread_join(tTid2, NULL);
+    RETURN_IF_ERR(iRet);
+
+    fooBarFree(obj);
+    pthread_mutex_destroy(&tL1);
+    pthread_mutex_destroy(&tL2);
+#endif
+    return iRet;
+}

@@ -1,0 +1,205 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <assert.h>
+#include <stdint.h>
+#include <math.h>
+#include <pthread.h>
+
+#include "leetcode.h"
+
+/*
+ *  leetcode 114:
+ *  Level    : mid
+ *  1116. Print Zero Even Odd
+ *  realize by state var and semaphore
+ */
+
+#define CHECK_VARIABLE(l,r) do{if(0 != r){fprintf(stderr,"[%s], err:[%d]\n",l,r);break;}}while(0);
+#define SET_BIT(x, y)  (x |= (1<<y))
+#define NEG_BIT(x, y)  (x ^= (1<<y))
+#define GET_BIT(x, y)  ((x)>>y & 0x1)
+#define L pthread_mutex_t
+#define LOCK(t) pthread_mutex_lock(&t)
+#define UNLOCK(t) pthread_mutex_unlock(&t)
+
+/* zero odd even */
+L tL1;
+L tL2;
+L tL3;
+
+void P(L* t)
+{ 
+    while (pthread_mutex_trylock(t) != 0) {}
+    return;
+}
+
+void V(L* t)
+{ 
+    if (pthread_mutex_unlock(t) == -1) {
+        fprintf(stderr, "[%s].\n", "pthread_mutex_unlock error.");
+    }
+    return;
+}
+
+void printNumber(int x)
+{
+    printf("%d", x); 
+    return;
+}
+
+typedef struct {
+    int n;
+} ZeroEvenOdd;
+
+ZeroEvenOdd* zeroEvenOddCreate(int n) {
+    ZeroEvenOdd* obj = (ZeroEvenOdd*) malloc(sizeof(ZeroEvenOdd));
+    obj->n = n;
+    return obj;
+}
+
+void threadOnceInit(){
+    int iRet = -1;
+
+    iRet    = pthread_mutex_init(&tL1, NULL);
+    CHECK_VARIABLE("tL1 init error.", iRet);
+
+    iRet    = pthread_mutex_init(&tL2, NULL);
+    CHECK_VARIABLE("tL1 init error.", iRet);
+
+    iRet    = pthread_mutex_init(&tL3, NULL);
+    CHECK_VARIABLE("tL1 init error.", iRet);
+
+    P(&tL2); 
+    P(&tL3); 
+
+    return;
+}
+
+void zero(ZeroEvenOdd* obj) {   
+    int             iRet                = 0;
+    int             i                   = 0;
+
+    iRet = pthread_once(&tOnce, threadOnceInit);
+    CHECK_VARIABLE("pthread_once error. \n", iRet);
+
+    for (; i < obj->n; i++)
+    {
+        P(&tL1);
+        printNumber(0);
+        if (i % 2) 
+        {
+            V(&tL3);
+        }
+        else
+        {
+            V(&tL2);
+        }
+    }
+    
+    pthread_exit(NULL);
+}
+
+void odd(ZeroEvenOdd* obj) { 
+    int             iRet                = 0;
+    int             i                   = 1;
+
+    iRet = pthread_once(&tOnce, threadOnceInit);
+    CHECK_VARIABLE("pthread_once error. \n", iRet);
+    
+    for (; i <= obj->n; i += 2)
+    {
+        P(&tL2);
+        printNumber(i);
+        V(&tL1);
+    }
+
+    pthread_exit(NULL); 
+}
+
+
+void even(ZeroEvenOdd* obj) {
+    int             iRet                = 0;
+    int             i                   = 2;
+
+    iRet = pthread_once(&tOnce, threadOnceInit);
+    CHECK_VARIABLE("pthread_once error. \n", iRet);
+
+    for (; i <= obj->n; i += 2)
+    {
+        P(&tL3);
+        printNumber(i);
+        V(&tL1);
+    }
+
+    pthread_exit(NULL); 
+}
+
+void zeroEvenOddFree(ZeroEvenOdd* obj) {
+    if (obj) 
+    {
+        free(obj);
+        obj = NULL;
+    }
+    return; 
+}
+
+#define RETURN_IF_ERR(ret) \
+    if (0 != ret) {printf("Get errorcode = [%d] line = [%d].\n", ret, __LINE__); return ret;}
+int main()
+{
+    int             iRet            = 0;
+    int*            pvRet           = NULL;
+    pthread_t       tTid1           = 0;
+    pthread_t       tTid2           = 0;
+    pthread_t       tTid3           = 0;
+
+    ZeroEvenOdd*    obj             = NULL;
+
+#if 0
+    obj = zeroEvenOddCreate(1);
+    RETURN_IF_ERR(obj == NULL);
+
+    iRet = pthread_create(&tTid1, NULL, zero, obj);
+    iRet = pthread_create(&tTid2, NULL, odd, obj);
+    iRet = pthread_create(&tTid3, NULL, even, obj);
+
+    iRet = pthread_join(tTid1, NULL);
+    RETURN_IF_ERR(iRet);
+    iRet = pthread_join(tTid2, NULL);
+    RETURN_IF_ERR(iRet);
+    iRet = pthread_join(tTid3, NULL);
+    RETURN_IF_ERR(iRet);
+#endif
+    
+#if 1
+    obj = zeroEvenOddCreate(10);
+    RETURN_IF_ERR(obj == NULL);
+
+    iRet = pthread_create(&tTid1, NULL, zero, obj);
+    if (iRet) return iRet;
+
+    iRet = pthread_create(&tTid2, NULL, odd, obj);
+    if (iRet) return iRet;
+
+    iRet = pthread_create(&tTid3, NULL, even, obj);
+    if (iRet) return iRet;
+
+
+
+    iRet = pthread_join(tTid1, NULL);
+    RETURN_IF_ERR(iRet);
+
+    iRet = pthread_join(tTid2, NULL);
+    RETURN_IF_ERR(iRet);
+
+    iRet = pthread_join(tTid3, NULL);
+    RETURN_IF_ERR(iRet);
+
+    zeroEvenOddFree(obj);
+    pthread_mutex_destroy(&tL1);
+    pthread_mutex_destroy(&tL2);
+    pthread_mutex_destroy(&tL3);
+#endif
+    return iRet;
+}
