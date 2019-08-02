@@ -11,6 +11,111 @@
 #define false 0
 #include "leetcode.h"
 /*
+ *  leetcode 121:
+ *  Level    : easy
+ *  941. Valid Mountain Array
+ *
+ */  
+#if 0
+#define MAX(a, b)        ((a > b) ? a : b)
+#define MIN(a, b)        ((a < b) ? a : b)
+#endif
+int MAX(int a, int b )
+{
+    return  ((a > b) ? a : b);
+}
+
+int MIN(int a, int b )
+{
+    return  ((a < b) ? a : b);
+}
+int isrp(int a, int b)
+{
+    if(a==1||b==1)   
+        return true;
+    while(1)
+    {       
+        int t = a%b;
+        if(t == 0) 
+        {
+            break;
+        }
+        else
+        {
+            a = b;
+            b = t;
+        }
+    }
+    if(b>1) return false; 
+    else return true;   
+} 
+bool hasGroupsSizeX(int* deck, int deckSize){
+
+    /* 1. find different ele and add to arr */
+    /* 2. get count */
+    /* 3. judge */
+
+    int i, j, k;
+    int iCount = 0;
+    int aiIndex[deckSize];
+    int *piArrCount = NULL;
+
+    for (i = 0; i < deckSize; i++)
+    {
+        for (j = 0; j < iCount; j++)
+        {
+            if (deck[i] == aiIndex[j]) break;
+        }
+
+        if (j == iCount)
+        {
+            /* not find */
+            aiIndex[iCount] = deck[i];
+            iCount++;
+        }
+        
+    }
+
+    piArrCount = malloc(sizeof(int) * iCount);
+    memset(piArrCount, 0x00, sizeof(int) * iCount);
+
+    /* get count */
+    for (k = 0; k < iCount; k++)
+    {
+        for (i = 0; i < deckSize; i++)
+        {
+            if (deck[i] == aiIndex[k]) piArrCount[k]++;
+        }
+        
+    } 
+    /* judge */
+    for (i = 1; i < k; i++)
+    {
+
+        if (piArrCount[i] == 1) return false;
+        if ((piArrCount[i] != piArrCount[i - 1]) && 
+            ((MAX(piArrCount[i], piArrCount[i - 1]) % MIN(piArrCount[i], piArrCount[i - 1])) != 0) 
+        )
+        {
+            //if ((piArrCount[i] % 2 == 0) && (piArrCount[i - 1] % 2 == 0))
+            if (!isrp(piArrCount[i], piArrCount[i-1]))
+            {
+                continue;
+            }
+            free(piArrCount);
+            piArrCount = NULL;
+            return false;
+        }
+    }
+
+    free(piArrCount);
+    piArrCount = NULL;
+    return true;
+}
+
+
+
+/*
  *  leetcode 120:
  *  Level    : easy
  *  941. Valid Mountain Array
@@ -146,10 +251,14 @@ int dayOfYear(char * date){
 
 int main()
 {
-    int   aiArr[] = {0,1,2,3,4,5,6,7,8,9};
+    //int   aiArr[] = {1,2,3,4,4,3,2,1};
+    //int   aiArr[] = {0,0,0,0,1,1,2,2,3,3};
+    //int   aiArr[] = {0,0,0,0,1,1,2,2,3,3};
+    //int   aiArr[] = {0,0,0,0,1,1,2,2,3,3};
+    int   aiArr[] = {0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,3,3,3,3,3,3,4,4,4,5,5,5,6,6,6,7,7,7};
     int   iRet = 0;
 
-    iRet = validMountainArray(aiArr, sizeof(aiArr) / sizeof(int));
+    iRet = hasGroupsSizeX(aiArr, sizeof(aiArr) / sizeof(int));
 
     printf("iRet = %s", (iRet == 0) ? "false" : "true");
 
