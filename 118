@@ -16,19 +16,9 @@
  *  941. Valid Mountain Array
  *
  */  
-#if 0
 #define MAX(a, b)        ((a > b) ? a : b)
 #define MIN(a, b)        ((a < b) ? a : b)
-#endif
-int MAX(int a, int b )
-{
-    return  ((a > b) ? a : b);
-}
 
-int MIN(int a, int b )
-{
-    return  ((a < b) ? a : b);
-}
 int isrp(int a, int b)
 {
     if(a==1||b==1)   
