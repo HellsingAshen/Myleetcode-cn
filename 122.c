@@ -10,22 +10,123 @@
 #define true 1
 #define false 0
 #include "leetcode.h"
+
+/*
+ *  leetcode 1060:
+ *  Level    : easy
+ * 
+ * 
+ */  
+
+#define TOTAL_CHAR_NUM (26)
+int canBeConstruct(int* pi, int iSize, char* pcWord)
+{
+    int                 aiBaseChar[26]      = {0};
+    int                 i                   = 0;
+    
+    memcpy(aiBaseChar, pi, iSize * sizeof(int));
+
+    for (i = 0; i < strlen(pcWord); i++)
+    {
+        if (--aiBaseChar[pcWord[i] - 'a'] < 0) return 0;
+    }
+    return 1;
+} 
+
+int countCharacters(char ** words, int wordsSize, char * chars){
+    int                 aiBase[26]          = {0};
+    int                 i                   = 0;
+    int                 iSumLength          = 0;
+
+    for (; i < strlen(chars); i++)
+    {
+        aiBase[chars[i] - 'a']++;
+    }
+    
+    for (i = 0; i < wordsSize; i++)
+    {
+        if (canBeConstruct(aiBase, TOTAL_CHAR_NUM, words[i]))
+        {
+            iSumLength += strlen(words[i]);
+        }
+    }
+
+    return iSumLength;
+}
+
+/*
+ *  leetcode 1071:
+ *  Level    : easy
+ * 
+ * 
+ */  
+
+char* getMinSubStr(char* pcStr);
+#define MAX(a, b) ((a > b) ? a : b)
+#define MIN(a, b) ((a < b) ? a : b)
+char * gcdOfStrings(char * str1, char * str2){
+    char*               pcSub               = NULL;
+    char*               pcShort             = NULL;
+    char*               pcLong              = NULL;
+
+    pcShort = ((strlen(str1) == MAX(strlen(str1), strlen(str2))) ? str2 : str1);
+    pcLong  = ((strlen(str1) == MAX(strlen(str1), strlen(str2))) ? str1 : str2);
+    pcSub   = getMinSubStr(pcShort);
+
+    if (isDividedStr(pcLong, pcSub)) return pcSub;
+    return "";
+}
+
+/* 0 -- not 
+ * 1 -- ok
+ */
+int  isDividedStr(char * str1, char * str2){
+    int                 i                   = 0;
+
+    if (strlen(str1) % strlen(str2) != 0)  return 0;
+
+    for (; i < strlen(str1); i = i + strlen(str2))
+    {
+        if (strncmp(str2, str1 + i, MIN(strlen(str2), strlen(str1 + i)))) return 0;
+    }
+    return 1;
+}
+
+char* getMinSubStr(char* pcStr){
+    char*               pcOut               = NULL;
+    int                 i                   = 1;
+
+    pcOut   = malloc(strlen(pcStr) + 1);
+
+    for (; i <= strlen(pcStr); i++)
+    {
+        memset(pcOut, 0, strlen(pcStr) + 1);
+        memcpy(pcOut, pcStr, i);
+        if (isDividedStr(pcStr, pcOut))
+            return pcOut;
+    } 
+    return NULL;
+}
+
+
 /*
  *  leetcode 1046:
  *  Level    : easy
  * 
  * 
  */  
-#define MAX(a, b) ((a > b) ? a : b)
-#define MIN(a, b) ((a < b) ? a : b)
+#define MAXP(a, b) ((*(int*)a >= *(int*)b) ? a : b)
+#define MINP(a, b) ((*(int*)a < *(int*)b) ? a : b)
 
-int* Get2Big(int* piArr, int iSize, int iTag)
+int* get2Big(int* piArr, int iSize, int iTag)
 {
     int                 i                   = 0;
-    int                 j                   = 0;
-    int*                m                   = 0;
-    int*                n                   = 0;
-    for (m = &MAX(piArr[0], piArr[1]), n = &MIN(piArr[0], piArr[1]) i = 2 ; i < size; i++)
+    int*                m                   = NULL;
+    int*                n                   = NULL;
+
+    for (m = MAXP(&piArr[0], &piArr[1]), n = MINP(&piArr[0], &piArr[1]), i = 2;
+        i < iSize; 
+        i++)
     {
         if (piArr[i] > *m) 
         {
@@ -41,16 +142,16 @@ int* Get2Big(int* piArr, int iSize, int iTag)
     if (iTag == 2) return n;
     return m;
 }
+
 int lastStoneWeight(int* stones, int stonesSize){
-    int                 i                   = 0;
-    int                 j                   = 0;
     int                *pm                  = NULL;
     int                *pn                  = NULL;
 
+    if (1 == stonesSize) return stones[0];
 
-    for (pm=Get2Big(stones, stonesSize, 1), pn=Get2Big(stones, stonesSize, 2); 
-        (*pm != 0 && *pn != 0); 
-        pm=Get2Big(stones, stonesSize, 1), pn=Get2Big(stones, stonesSize, 2))
+    for (pm=get2Big(stones, stonesSize, 1), pn=get2Big(stones, stonesSize, 2); \
+        (*pm != 0) && (*pn != 0); \
+        pm=get2Big(stones, stonesSize, 1), pn=get2Big(stones, stonesSize, 2))
     {
             if (*pm == *pn)
                 *pm = *pn = 0;
@@ -62,7 +163,6 @@ int lastStoneWeight(int* stones, int stonesSize){
     }
     return *pm;
 }
-
 
 /*
  *  leetcode 1047:
@@ -189,7 +289,7 @@ void dumpNode(struct TreeNode* sn, struct TreeNode** n)
 }
 void dumpTree(struct TreeNode* t1, struct TreeNode** rt)
 {
-    struct TreeNode*    t               = NULL; 
+    //struct TreeNode*    t               = NULL; 
     struct TreeNode*    rn              = NULL; 
 
     if (t1){
@@ -227,10 +327,9 @@ struct TreeNode* mergeTrees(struct TreeNode* t1, struct TreeNode* t2){
 int main()
 {
     int             iRet                = 0;
-    char* pc           = malloc(9);
-    memcpy(pc, "aaaaaaaa", 8);
-    char* p = removeDuplicates(pc);
-    printf("p is [%s]\n", p ? p : "NULL");
+    int             aiArr[]             = {2, 2};
+    iRet = lastStoneWeight(aiArr, sizeof(aiArr) / sizeof(int));
+    printf("iRet is [%d]\n", iRet);
     
     return iRet;
 }
